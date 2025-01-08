@@ -17,7 +17,9 @@
     "react-dom": "18.3.1",
     "react-native": "0.76.5",
     "react-native-web": "~0.19.13",
-    "react-redux": "^9.2.0"
+    "react-redux": "^9.2.0",
+    "tailwindcss-react-native": "^1.7.10",
+    "twrnc": "^4.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
