@@ -1,6 +1,7 @@
 import React from 'react'
 import tw from 'twrnc';
 import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native'
+import NavOptions from '../components/NavOptions';
 
 const HomeScreen = () => {
     return (
@@ -9,13 +10,14 @@ const HomeScreen = () => {
                 <Image
                     source={require('../assets/Logo.png')}
                     style={{ 
-                        width: 200, 
+                        width: 250, 
                         height: 150, 
                         resizeMode: "contain",
-                        marginLeft: -50,
+
                     }}
                 />
-            {/* <Text style={tw`text-blue-500 p-10`}>Flippy</Text> */}
+
+                <NavOptions></NavOptions>
             </View>
         </SafeAreaView>
     );
