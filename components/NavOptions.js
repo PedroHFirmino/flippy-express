@@ -1,14 +1,23 @@
 import React from 'react';
-import { Text, StyleSheet, View, TouchableOpacity, FlatList, Image } from 'react-native'
+import { Text, StyleSheet, View, TouchableOpacity, FlatList, Image, } from 'react-native'
+import { Icon } from 'react-native-elements';
 import tw from 'twrnc';
 
 
 const data = [
     {
         id:"123",
-        title: "Solicite um Motoboy",
-        image: require('../assets/motoboy.png'),
+        title: "Comida",
+        image: require('../assets/food.png'),
         // screen "Mapa",
+
+},
+
+{
+    id:"456",
+    title: "Encomenda",
+    image: require('../assets/package.png'),
+    // screen "Mapa",
 
 },
 
@@ -25,7 +34,7 @@ const NavOptions = () => {
            keyExtractor={(item)=>item.id}
            renderItem={({item}) => (
                 <TouchableOpacity style={tw`p-2 pl-6 pb-8 pt-4 bg-gray-200 m-2 w-40`}>
-                    <View style={{ alignItems: 'center' }}>
+                    <View>
                         <Image
                             style = {{
                                 width:100,
@@ -33,7 +42,14 @@ const NavOptions = () => {
                                 resizeMode: "contain",
                             }}
                             source={item.image} /> 
-                        <Text style={tw`mt-1 font-semibold`} >{item.title}</Text>                    
+                        <Text style={tw`mt-2 font-semibold`} >{item.title}</Text>
+                        <Icon
+                            style={[tw`p-2 rounded-full w-10 mt-4`, { backgroundColor: '#00b5f8' }]}
+                            name= 'arrowright' 
+                            color="white" 
+                            type="antdesign"
+                        
+                        />                    
                     </View>
                 </TouchableOpacity>
            )}
