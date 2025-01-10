@@ -1,18 +1,34 @@
-import { DefaultTheme } from '@react-navigation/native';
+import { DefaultTheme, useNavigation } from '@react-navigation/native';
 import React from 'react';
-import {View, Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
-import * as Animatable from 'react-native-animatable';
+import {View, Text, StyleSheet, Image, TouchableOpacity	} from 'react-native';
+import { style } from 'twrnc';
+import * as Animatable from 'react-native-animatable'
 
-export default function SignIn () {
+export default function SignUpUsers () {
+    const navigation = useNavigation();
     return (
         <View style={styles.container}>
             <Animatable.View 
                 animation="fadeInLeft" delay={500}
                 style={styles.containerHeader}>
-            <Text style={styles.message}>Login</Text>
+            <Text style={styles.message}>Cadastre-se</Text>
             </Animatable.View>
 
             <Animatable.View animation="fadeInUp" style={styles.containerForm}>
+
+            <Text style={styles.title}>Nome/Razão Social</Text>
+                <TextInput 
+                    placeholder="Digite seu nome ou Razão Social"
+                    style={styles.input}
+                />
+
+                
+            <Text style={styles.title}>CPF/CNPJ</Text>
+                <TextInput 
+                    placeholder="Digite seu CPF ou CNPJ"
+                    style={styles.input}
+                />
+
                 <Text style={styles.title}>E-mail</Text>
                 <TextInput 
                     placeholder="Digite seu E-mail"
@@ -21,20 +37,15 @@ export default function SignIn () {
 
                 <Text style={styles.title}>Senha</Text>
                 <TextInput 
-                    placeholder="Senha"
+                    placeholder="Digite uma senha"
                     style={styles.input}
                 />
 
-                <TouchableOpacity style={styles.button}>
-                    
-                    <Text style={styles.buttonText}>Acessar</Text>
-
-                </TouchableOpacity>
-
                 <TouchableOpacity 
-                    onPress={() => navigation.navigate ('SignUpUsers')}
-                    style={styles.buttonRegister}>
-                    <Text style={styles.registerText}>Ainda não possui uma conta? Cadastre-se!</Text>
+                        onPress={() => navigation.navigate ('HomeScreen') }
+                        style={styles.button}>
+                    
+                    <Text style={styles.buttonText}>Cadastrar</Text>
 
                 </TouchableOpacity>
 

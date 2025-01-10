@@ -3,21 +3,21 @@ import React from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, FlatList, Image, } from 'react-native'
 import { Icon } from 'react-native-elements';
 import tw from 'twrnc';
-
+import * as Animatable from 'react-native-animatable';
 
 const data = [
     {
         id:"123",
-        title: "Comida",
-        image: require('../assets/food.png'),
+        title: "Estabelecimento",
+        image: require('../assets/estabelecimento.png'),
         screen: "Mapa",
 
 },
 
 {
     id:"456",
-    title: "Encomenda",
-    image: require('../assets/package.png'),
+    title: "Motoboy",
+    image: require('../assets/motoboy.png'),
     screen: "Mapa",
 
 },
@@ -36,9 +36,11 @@ const NavOptionsHome = () => {
            keyExtractor={(item)=>item.id}
            renderItem={({item}) => (
                 <TouchableOpacity 
-                    onPress={() => navigation.navigate (item.screen) }
-                    style={tw`p-2 pl-6 pb-8 pt-4 bg-gray-200 m-2 w-40`}>                
+                    onPress={() => navigation.navigate ('SignIn') }
+                    style={tw`p-2 pl-5 pb-8 pt-4 bg-gray-200 m-2 w-40`}>                
                     <View>
+                        <Animatable.View
+                        animation="fadeInRight" delay={500}>
                         <Image
                             style = {{
                                 width:100,
@@ -53,7 +55,8 @@ const NavOptionsHome = () => {
                             color="white" 
                             type="antdesign"
                         
-                        />                    
+                        />             
+                        </Animatable.View>       
                     </View>
                 </TouchableOpacity>
            )}

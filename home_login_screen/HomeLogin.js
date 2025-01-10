@@ -1,7 +1,6 @@
 import { DefaultTheme, useNavigation } from '@react-navigation/native';
 import React from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity	} from 'react-native';
-import NavOptionsHome from '../home_components/NavOptionsHome';
 import { style } from 'twrnc';
 import * as Animatable from 'react-native-animatable'
 
@@ -30,7 +29,7 @@ export default function HomeLogin () {
                 <Text style={styles.text}>Faça login para começar</Text>
 
                 <TouchableOpacity style={styles.button}
-                    onPress={ () => navigation.navigate('SignIn')}>
+                    onPress={ () => navigation.navigate('HomeChoice')}>
                     <Text style={styles.buttonText}>Começar!</Text>
 
                 </TouchableOpacity>

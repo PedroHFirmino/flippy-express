@@ -5,6 +5,8 @@ import { store } from './store';
 import HomeScreen from './user_screens/HomeScreen';
 import MapScreen from './user_screens/MapScreen';
 import HomeLogin from './home_login_screen/HomeLogin';
+import HomeChoice from './home_login_screen/HomeChoice';
+import SignUpUsers from './sign_up_users/SignUpUsers';
 import SignIn from './home_login_screen/SignIn';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-gesture-handler';
@@ -28,12 +30,30 @@ export default function App() {
             }}
           />
           <Stack.Screen 
+            name='HomeChoice'
+            component={HomeChoice}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen 
             name='SignIn'
             component={SignIn}
             options={{
               headerShown: false,
             }}
           />
+          {/* SignUp */}
+          <Stack.Screen 
+            name='SignUpUsers'
+            component={SignUpUsers}
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          {/* Users Menu */}
+
           <Stack.Screen 
             name='Início'
             component={HomeScreen}
