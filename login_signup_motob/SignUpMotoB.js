@@ -59,7 +59,7 @@ export default function SignUpMotoB() {
         />
 
         <TouchableOpacity 
-          onPress={() => navigation.navigate('')}
+          onPress={() => navigation.navigate('SuccessScreenMotoB')}
           style={styles.button}
         >
           <Text style={styles.buttonText}>Cadastrar</Text>

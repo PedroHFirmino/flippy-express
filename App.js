@@ -8,12 +8,15 @@ import HomeLogin from './home_login_screen/HomeLogin';
 import HomeChoice from './home_login_screen/HomeChoice';
 import SignUpUsers from './login_signup_user/SignUpUsers';
 import SignInUser from './login_signup_user/SignInUser';
-import SuccessScreenUser from './login_signup_user/SuccessScreenUser';
 import SignInMotoB from './login_signup_motob/SignInMotoB';
+import SuccessScreenUser from './login_signup_user/SuccessScreenUser';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import SignUpMotob from './login_signup_motob/SignUpMotob';
+import SuccessScreenMotoB from './login_signup_motob/SuccessScreenMotoB';
+
 
 
 
@@ -87,12 +90,20 @@ export default function App() {
             }}
           />
           <Stack.Screen 
-            name='SignUpMotoB'
-            component={SignInMotoB}
+            name='SignUpMotob'
+            component={SignUpMotob}
             options={{
               headerShown: false,
             }}
           />
+          <Stack.Screen 
+            name='SuccessScreenMotoB'
+            component={SuccessScreenMotoB}
+            options={{
+              headerShown: false,
+            }}
+          />
+
 
 
         </Stack.Navigator>

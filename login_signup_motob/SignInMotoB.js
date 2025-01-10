@@ -4,7 +4,7 @@ import {View, Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native'
 import * as Animatable from 'react-native-animatable';
 import {useNavigation } from '@react-navigation/native';
 
-export default function SignUpMotoB () {
+export default function SignInMotoB () {
     const navigation = useNavigation();
     return (
         <View style={styles.container}>
@@ -34,7 +34,7 @@ export default function SignUpMotoB () {
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                    onPress={() => navigation.navigate ('SignUpMotoB')}
+                    onPress={() => navigation.navigate ('SignUpMotob')}
                     style={styles.buttonRegister}>
                     <Text style={styles.registerText}>Ainda não possui uma conta? Cadastre-se!</Text>
 

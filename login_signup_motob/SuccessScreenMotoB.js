@@ -51,7 +51,7 @@ export default function SuccessScreen() {
         <Animatable.View animation="fadeIn" duration={1000} delay={1000}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate('SignInUser')}>
+            onPress={() => navigation.navigate('SignInMotoB')}>
             <Text style={styles.buttonText}>Fazer Login</Text>
           </TouchableOpacity>
         </Animatable.View>
