@@ -5,8 +5,6 @@ import NavOptions from '../home_components/NavOptionsHome';
 import * as Animatable from 'react-native-animatable';
 
 
-
-
 const HomeChoice = () => {
     return (
         <SafeAreaView style={tw`bg-white-900 h-full`}>

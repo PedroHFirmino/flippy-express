@@ -8,10 +8,12 @@ import HomeLogin from './home_login_screen/HomeLogin';
 import HomeChoice from './home_login_screen/HomeChoice';
 import SignUpUsers from './sign_up_users/SignUpUsers';
 import SignIn from './home_login_screen/SignIn';
+import SuccessScreen from './home_login_screen/SuccessScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 
 
 export default function App() {
@@ -43,6 +45,13 @@ export default function App() {
               headerShown: false,
             }}
           />
+          <Stack.Screen 
+            name='SuccessScreen'
+            component={SuccessScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
           {/* SignUp */}
           <Stack.Screen 
             name='SignUpUsers'
@@ -55,7 +64,7 @@ export default function App() {
           {/* Users Menu */}
 
           <Stack.Screen 
-            name='Início'
+            name='HomeScreen'
             component={HomeScreen}
             options={{
               headerShown: false,

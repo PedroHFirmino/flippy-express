@@ -18,7 +18,7 @@ const data = [
     id:"456",
     title: "Motoboy",
     image: require('../assets/motoboy.png'),
-    screen: "Mapa",
+    screen: "HomeScreen",
 
 },
 
