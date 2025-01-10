@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput } from 'reac
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 
-export default function SignUpUsers() {
+export default function SignUpMotoB() {
   const [selectedGender, setSelectedGender] = useState("");
   const navigation = useNavigation();
 
@@ -15,7 +15,7 @@ export default function SignUpUsers() {
       </Animatable.View>
 
       <Animatable.View animation="fadeInUp" style={styles.containerForm}>
-        <Text style={styles.title}>Nome/Razão Social</Text>
+        <Text style={styles.title}>Nome</Text>
         <TextInput 
           placeholder="Digite seu nome ou Razão Social"
           style={styles.input}
@@ -31,12 +31,11 @@ export default function SignUpUsers() {
           <Picker.Item label="Masculino" value="masculino" />
           <Picker.Item label="Feminino" value="feminino" />
           <Picker.Item label="Outro" value="outro" />
-          <Picker.Item label="Prefiro não dizer" value="null" />
         </Picker>
 
-        <Text style={styles.title}>CPF/CNPJ</Text>
+        <Text style={styles.title}>CPF</Text>
         <TextInput 
-          placeholder="Digite seu CPF ou CNPJ"
+          placeholder="Digite seu CPF"
           style={styles.input}
         />
 
@@ -54,13 +53,13 @@ export default function SignUpUsers() {
         />
         <Text style={styles.title}>Confirme sua senha</Text>
         <TextInput 
-            placeholder="Confirme sua senha"
-            style={styles.input}
-            secureTextEntry
+          placeholder="Confirme sua senha"
+          style={styles.input}
+          secureTextEntry
         />
 
         <TouchableOpacity 
-          onPress={() => navigation.navigate('SuccessScreen')}
+          onPress={() => navigation.navigate('')}
           style={styles.button}
         >
           <Text style={styles.buttonText}>Cadastrar</Text>

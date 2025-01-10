@@ -4,7 +4,7 @@ import {View, Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native'
 import * as Animatable from 'react-native-animatable';
 import {useNavigation } from '@react-navigation/native';
 
-export default function SignIn () {
+export default function SignInUser () {
     const navigation = useNavigation();
     return (
         <View style={styles.container}>

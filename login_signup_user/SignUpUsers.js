@@ -15,7 +15,7 @@ export default function SignUpUsers() {
       </Animatable.View>
 
       <Animatable.View animation="fadeInUp" style={styles.containerForm}>
-        <Text style={styles.title}>Nome</Text>
+        <Text style={styles.title}>Nome/Razão Social</Text>
         <TextInput 
           placeholder="Digite seu nome ou Razão Social"
           style={styles.input}
@@ -31,11 +31,12 @@ export default function SignUpUsers() {
           <Picker.Item label="Masculino" value="masculino" />
           <Picker.Item label="Feminino" value="feminino" />
           <Picker.Item label="Outro" value="outro" />
+          <Picker.Item label="Prefiro não dizer" value="null" />
         </Picker>
 
-        <Text style={styles.title}>CPF</Text>
+        <Text style={styles.title}>CPF/CNPJ</Text>
         <TextInput 
-          placeholder="Digite seu CPF"
+          placeholder="Digite seu CPF ou CNPJ"
           style={styles.input}
         />
 
@@ -53,13 +54,13 @@ export default function SignUpUsers() {
         />
         <Text style={styles.title}>Confirme sua senha</Text>
         <TextInput 
-          placeholder="Confirme sua senha"
-          style={styles.input}
-          secureTextEntry
+            placeholder="Confirme sua senha"
+            style={styles.input}
+            secureTextEntry
         />
 
         <TouchableOpacity 
-          onPress={() => navigation.navigate('')}
+          onPress={() => navigation.navigate('SuccessScreenUser')}
           style={styles.button}
         >
           <Text style={styles.buttonText}>Cadastrar</Text>

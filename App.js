@@ -6,9 +6,10 @@ import HomeScreen from './user_screens/HomeScreen';
 import MapScreen from './user_screens/MapScreen';
 import HomeLogin from './home_login_screen/HomeLogin';
 import HomeChoice from './home_login_screen/HomeChoice';
-import SignUpUsers from './sign_up_users/SignUpUsers';
-import SignIn from './home_login_screen/SignIn';
-import SuccessScreen from './home_login_screen/SuccessScreen';
+import SignUpUsers from './login_signup_user/SignUpUsers';
+import SignInUser from './login_signup_user/SignInUser';
+import SuccessScreenUser from './login_signup_user/SuccessScreenUser';
+import SignInMotoB from './login_signup_motob/SignInMotoB';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
@@ -38,21 +39,21 @@ export default function App() {
               headerShown: false,
             }}
           />
+          {/* Users */}
           <Stack.Screen 
-            name='SignIn'
-            component={SignIn}
+            name='SignInUser'
+            component={SignInUser}
             options={{
               headerShown: false,
             }}
           />
           <Stack.Screen 
-            name='SuccessScreen'
-            component={SuccessScreen}
+            name='SuccessScreenUser'
+            component={SuccessScreenUser}
             options={{
               headerShown: false,
             }}
           />
-          {/* SignUp */}
           <Stack.Screen 
             name='SignUpUsers'
             component={SignUpUsers}
@@ -77,6 +78,23 @@ export default function App() {
               headerShown: false,
             }}
           />
+          {/* Motoboy */}
+          <Stack.Screen 
+            name='SignInMotoB'
+            component={SignInMotoB}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen 
+            name='SignUpMotoB'
+            component={SignInMotoB}
+            options={{
+              headerShown: false,
+            }}
+          />
+
+
         </Stack.Navigator>
       </SafeAreaProvider>
       </NavigationContainer>

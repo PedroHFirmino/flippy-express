@@ -52,10 +52,11 @@ const NavOptions = () => {
                             name= 'arrowright' 
                             color="white" 
                             type="antdesign"
-                        
+                            
                         />                    
                     </View>
                 </TouchableOpacity>
+                
            )}
     />
     );
