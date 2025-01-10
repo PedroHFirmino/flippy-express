@@ -1,7 +1,7 @@
 import React from 'react'
 import tw from 'twrnc';
 import { StyleSheet, Text, View, SafeAreaView, Image,  } from 'react-native'
-import NavOptions from '../components/NavOptions';
+import NavOptions from '../user_components/NavOptions';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { GOOGLE_MAPS_APIKEY} from "@env";
 import 'react-native-get-random-values';

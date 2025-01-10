@@ -2,8 +2,10 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Provider } from 'react-redux';
 import { store } from './store';
-import HomeScreen from './screens/HomeScreen';
-import MapScreen from './screens/MapScreen';
+import HomeScreen from './user_screens/HomeScreen';
+import MapScreen from './user_screens/MapScreen';
+import HomeLogin from './home_login_screen/HomeLogin';
+import SignIn from './home_login_screen/SignIn';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
@@ -18,6 +20,20 @@ export default function App() {
       <NavigationContainer>
       <SafeAreaProvider>
         <Stack.Navigator>
+        <Stack.Screen 
+            name='HomeLogin'
+            component={HomeLogin}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen 
+            name='SignIn'
+            component={SignIn}
+            options={{
+              headerShown: false,
+            }}
+          />
           <Stack.Screen 
             name='Início'
             component={HomeScreen}
