@@ -8,7 +8,7 @@ export default function SuccessScreen() {
   const [showButton, setShowButton] = useState(false); 
   const messages = [
     "Cadastro realizado com sucesso!",
-    "Seja bem-vindo(a) ao Flipy Express!",
+    "Seja bem-vindo(a) ao Flippy Express!",
     "Agora você pode começar a usar!"
   ];
   const navigation = useNavigation();

@@ -17,7 +17,7 @@ export default function SignUpMotoB() {
       <Animatable.View animation="fadeInUp" style={styles.containerForm}>
         <Text style={styles.title}>Nome</Text>
         <TextInput 
-          placeholder="Digite seu nome ou Razão Social"
+          placeholder="Digite seu nome"
           style={styles.input}
         />
 
