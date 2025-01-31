@@ -37,6 +37,6 @@ const MapUser = () => {
     );
 };
 
-export default MapUser
+export default MapUser;
 
 const styles = StyleSheet.create({})
