@@ -24,11 +24,30 @@ const HomeChoice = () => {
                 />
                 </Animatable.View>
 
+                {/* Intro */}
                 <Animatable.View
                     animation="fadeInLeft" delay={100}>
                 <Text style={styles.title}>Eu sou:</Text>
                 </Animatable.View>
+
                 <NavOptions />
+
+                {/* Noticias */}
+                <Animatable.View
+                    animation="fadeInLeft" delay={100}>
+                <Text style={styles.subtitle}>Notícias</Text>
+                <Image
+                    source={require('../assets/noticia.png')}
+                    style={{
+                        width: 330, 
+                        height: 230, 
+                        resizeMode: "contain",
+                        margin: "auto",
+
+                    }}
+                />
+                    
+                </Animatable.View>
             </View>
         </SafeAreaView>
     );
@@ -45,6 +64,20 @@ const styles = StyleSheet.create ({
 
         fontSize:28,
         fontWeight:'bold',
+        color:'#00b5f8',
+        paddingBottom:20,
+        paddingStart: '2%',
+        paddingEnd:'5%'
+        },
+
+            text: {
+        color: 'blue',
+    },
+
+    subtitle:{
+
+        fontSize:28,
+        fontWeight:'light',
         color:'#00b5f8',
         paddingBottom:20,
         paddingStart: '2%',

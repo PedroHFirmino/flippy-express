@@ -95,6 +95,8 @@ const NavOptionsHome = () => {
         scrollEnabled={false} 
       />
     </View>
+
+    
   );
 };
 

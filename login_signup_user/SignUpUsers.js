@@ -21,6 +21,12 @@ export default function SignUpUsers() {
           style={styles.input}
         />
 
+        <Text style={styles.title}>Telefone</Text>
+        <TextInput 
+          placeholder="Digite seu telefone"
+          style={styles.input}
+        />
+
         <Text style={styles.title}>Sexo</Text>
         <Picker
           selectedValue={selectedGender}
@@ -37,6 +43,30 @@ export default function SignUpUsers() {
         <Text style={styles.title}>CPF/CNPJ</Text>
         <TextInput 
           placeholder="Digite seu CPF ou CNPJ"
+          style={styles.input}
+        />
+
+        <Text style={styles.title}>Endereço</Text>
+        <TextInput 
+          placeholder="Digite seu endereço - nº"
+          style={styles.input}
+        />
+
+        <Text style={styles.title}>CEP</Text>
+        <TextInput 
+          placeholder="Digite seu CEP"
+          style={styles.input}
+        />
+
+      <Text style={styles.title}>Cidade</Text>
+        <TextInput 
+          placeholder="Digite sua cidade"
+          style={styles.input}
+        />
+
+      <Text style={styles.title}>Estado</Text>
+        <TextInput 
+          placeholder="Digite seu estado"
           style={styles.input}
         />
 

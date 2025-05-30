@@ -16,6 +16,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignUpMotoB from './login_signup_motob/SignUpMotoB';
 import SuccessScreenMotoB from './login_signup_motob/SuccessScreenMotoB';
+import ProfileScreen from './user_screens/ProfileScreen';
 
 
 
@@ -73,6 +74,14 @@ export default function App() {
             options={{
               headerShown: false,
             }}
+          />
+          <Stack.Screen
+            name='ProfileScreen'
+            component={ProfileScreen}
+            options={{
+              headerShown: false,
+            }}
+          
           />
           <Stack.Screen 
             name='Mapa'

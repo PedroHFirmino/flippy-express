@@ -34,7 +34,7 @@ export default function SignInMotoB () {
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                    onPress={() => navigation.navigate ('SignUpMotob')}
+                    onPress={() => navigation.navigate ('SignUpMotoB')}
                     style={styles.buttonRegister}>
                     <Text style={styles.registerText}>Ainda não possui uma conta? Cadastre-se!</Text>
 

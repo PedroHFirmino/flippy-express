@@ -1,14 +1,50 @@
 import { DefaultTheme, useNavigation } from '@react-navigation/native';
-import React from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity	} from 'react-native';
+import React, { useRef } from 'react';
+import {View, Text, StyleSheet, Image, TouchableOpacity, Alert, BackHandler } from 'react-native';
 import { style } from 'twrnc';
-import * as Animatable from 'react-native-animatable'
+import * as Animatable from 'react-native-animatable';
+import { Icon } from 'react-native-elements';
 
 
 export default function HomeLogin () {
     const navigation=useNavigation();
+
+    const ExitAlert = () => {
+        Alert.alert(
+            "Sair do Aplicativo",
+            "Tem certeza que deseja sair do App?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancelar"
+                    
+                },
+                {
+                    text: "Sair",
+                    onPress: () => BackHandler.exitApp(),
+                    style: "sair"
+                }
+                
+            ],
+            {cancelable: false}
+        );
+
+    };
+
+
     return (
         <View style={styles.container}>
+            <TouchableOpacity 
+                style={styles.exitButton}
+                onPress={ExitAlert}>
+                <Icon
+                    name="close"
+                        type="antdesign"
+                        color="#666"
+                        size={24}
+                    />
+                </TouchableOpacity>
+
             <View style={styles.containerLogo}>
                 <Animatable.Image
                     animation="flipInY"
@@ -31,7 +67,6 @@ export default function HomeLogin () {
                 <TouchableOpacity style={styles.button}
                     onPress={ () => navigation.navigate('HomeChoice')}>
                     <Text style={styles.buttonText}>Começar!</Text>
-
                 </TouchableOpacity>
             </Animatable.View>
         </View>
@@ -84,5 +119,12 @@ const styles =StyleSheet.create({
         color: 'white',
         fontSize:15,
         fontWeight:'bold',
+    },
+        exitButton: {
+        position: 'absolute',
+        top: 40,
+        right: 20,
+        zIndex: 1,
+        padding: 8,
     }
-})
+});
