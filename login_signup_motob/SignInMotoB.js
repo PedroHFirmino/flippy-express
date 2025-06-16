@@ -12,7 +12,7 @@ export default function SignInMotoB () {
     const handleLogin = () => {
         // Aqui você pode adicionar a lógica de autenticação real
         if (email && password) {
-            navigation.navigate('MotoboyMap');
+            navigation.navigate('MotoboyHome');
         } else {
             Alert.alert('Erro', 'Por favor, preencha todos os campos');
         }
