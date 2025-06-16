@@ -1,11 +1,23 @@
 import { DefaultTheme } from '@react-navigation/native';
-import React from 'react';
-import {View, Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
+import React, { useState } from 'react';
+import {View, Text, StyleSheet, TextInput, TouchableOpacity, Alert} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useNavigation } from '@react-navigation/native';
 
 export default function SignInMotoB () {
     const navigation = useNavigation();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = () => {
+        // Aqui você pode adicionar a lógica de autenticação real
+        if (email && password) {
+            navigation.navigate('MotoboyMap');
+        } else {
+            Alert.alert('Erro', 'Por favor, preencha todos os campos');
+        }
+    };
+
     return (
         <View style={styles.container}>
             <Animatable.View 
@@ -19,34 +31,35 @@ export default function SignInMotoB () {
                 <TextInput 
                     placeholder="Digite seu E-mail"
                     style={styles.input}
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
                 />
 
                 <Text style={styles.title}>Senha</Text>
                 <TextInput 
                     placeholder="Senha"
                     style={styles.input}
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
                 />
 
-                <TouchableOpacity style={styles.button}>
-                    
+                <TouchableOpacity 
+                    style={styles.button}
+                    onPress={handleLogin}>
                     <Text style={styles.buttonText}>Acessar</Text>
-
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                    onPress={() => navigation.navigate ('SignUpMotoB')}
+                    onPress={() => navigation.navigate('SignUpMotoB')}
                     style={styles.buttonRegister}>
                     <Text style={styles.registerText}>Ainda não possui uma conta? Cadastre-se!</Text>
-
                 </TouchableOpacity>
-
-
-
             </Animatable.View>
-            
         </View>
     );
-
 }
 
 const styles = StyleSheet.create ({

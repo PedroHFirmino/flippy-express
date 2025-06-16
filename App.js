@@ -17,6 +17,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignUpMotoB from './login_signup_motob/SignUpMotoB';
 import SuccessScreenMotoB from './login_signup_motob/SuccessScreenMotoB';
 import ProfileScreen from './user_screens/ProfileScreen';
+import MotoboyMapScreen from './mototboy_screens/MotoboyMapScreen';
 
 
 
@@ -108,6 +109,13 @@ export default function App() {
           <Stack.Screen 
             name='SuccessScreenMotoB'
             component={SuccessScreenMotoB}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen 
+            name='MotoboyMap'
+            component={MotoboyMapScreen}
             options={{
               headerShown: false,
             }}
