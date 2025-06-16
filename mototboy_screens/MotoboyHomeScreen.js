@@ -84,7 +84,10 @@ const MotoboyHomeScreen = () => {
                         <Text style={styles.menuText}>Ganhos</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.menuItem}>
+                    <TouchableOpacity 
+                        style={styles.menuItem}
+                        onPress={() => navigation.navigate('Config')}>
+                
                         <Icon
                             name="settings"
                             type="material"

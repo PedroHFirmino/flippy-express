@@ -1,6 +1,6 @@
 import React from 'react'
 import tw from 'twrnc';
-import { StyleSheet, Text, View, SafeAreaView, Image,  } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, Image, Touchable, TouchableOpacity,  } from 'react-native'
 import NavOptions from '../home_components/NavOptionsHome';
 import * as Animatable from 'react-native-animatable';
 
@@ -36,6 +36,7 @@ const HomeChoice = () => {
                 <Animatable.View
                     animation="fadeInLeft" delay={100}>
                 <Text style={styles.subtitle}>Notícias</Text>
+                <TouchableOpacity>
                 <Image
                     source={require('../assets/noticia.png')}
                     style={{
@@ -46,7 +47,7 @@ const HomeChoice = () => {
 
                     }}
                 />
-                    
+                    </TouchableOpacity>
                 </Animatable.View>
             </View>
         </SafeAreaView>
