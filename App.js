@@ -19,6 +19,7 @@ import SuccessScreenMotoB from './login_signup_motob/SuccessScreenMotoB';
 import ProfileScreen from './user_screens/ProfileScreen';
 import MotoboyMapScreen from './mototboy_screens/MotoboyMapScreen';
 import MotoboyHomeScreen from './mototboy_screens/MotoboyHomeScreen';
+import RankingScreen from './motoboy_components/RankingScreen';
 
 
 
@@ -124,6 +125,13 @@ export default function App() {
           <Stack.Screen 
             name='MotoboyMap'
             component={MotoboyMapScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen 
+            name='Ranking'
+            component={RankingScreen}
             options={{
               headerShown: false,
             }}

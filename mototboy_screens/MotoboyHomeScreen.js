@@ -3,6 +3,7 @@ import { StyleSheet, View, SafeAreaView, Image, TouchableOpacity, Text } from 'r
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
+import RankingScreen from '../motoboy_components/RankingScreen';
 
 const MotoboyHomeScreen = () => {
     const navigation = useNavigation();
@@ -61,7 +62,9 @@ const MotoboyHomeScreen = () => {
                 </TouchableOpacity>
 
                 <View style={styles.menuContainer}>
-                    <TouchableOpacity style={styles.menuItem}>
+                    <TouchableOpacity 
+                        style={styles.menuItem}
+                        onPress={() => navigation.navigate('Ranking')}>
                         <Icon
                             name="leaderboard"
                             type="material"

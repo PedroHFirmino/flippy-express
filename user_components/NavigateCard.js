@@ -31,7 +31,7 @@ const NavigateCard = () => {
             description: data.description,
           })
         );
-          navigation.navigate('Options')
+          navigation.navigate('buscaOpcoesCard')
         }}
         nearbyPlacesAPI='GooglePlacesSearch'
         debounce={400}
