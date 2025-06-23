@@ -1,11 +1,22 @@
 import { DefaultTheme } from '@react-navigation/native';
-import React from 'react';
-import {View, Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
+// import React, { useState } from 'react';
+import {View, Text, StyleSheet, TextInput, TouchableOpacity, Alert} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
 
 export default function SignInUser () {
     const navigation = useNavigation();
+        const [email, setEmail] = useState('');
+        const [password, setPassword] = useState('');
+    
+        const handleLogin = () => {
+            if (email && password) {
+                navigation.navigate('HomeScreen');
+            } else {
+                Alert.alert('Erro', 'Por favor, preencha todos os campos');
+            }
+        };
     return (
         <View style={styles.container}>
             <Animatable.View 
@@ -19,16 +30,22 @@ export default function SignInUser () {
                 <TextInput 
                     placeholder="Digite seu E-mail"
                     style={styles.input}
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"                    
                 />
 
                 <Text style={styles.title}>Senha</Text>
                 <TextInput 
                     placeholder="Senha"
                     style={styles.input}
+                    value={password}
+                    onChangeText={setPassword}
                 />
 
                 <TouchableOpacity style={styles.button}
-                    onPress={() => navigation.navigate ('HomeScreen')}>
+                    onPress={handleLogin}>
                     <Text style={styles.buttonText}>Acessar</Text>
 
                 </TouchableOpacity>

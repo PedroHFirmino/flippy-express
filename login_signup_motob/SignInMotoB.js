@@ -10,7 +10,6 @@ export default function SignInMotoB () {
     const [password, setPassword] = useState('');
 
     const handleLogin = () => {
-        // Aqui você pode adicionar a lógica de autenticação real
         if (email && password) {
             navigation.navigate('MotoboyHome');
         } else {
