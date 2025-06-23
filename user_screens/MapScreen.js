@@ -1,46 +1,22 @@
-import React from 'react'
-import tw from 'twrnc';
-import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native'
-import MapUser from '../user_components/MapUser';
-import NavigateCard from '../user_components/NavigateCard';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
+import NavigateCard from '../user_components/NavigateCard';
 import buscaOpcoesCard from '../user_components/buscaOpcoesCard';
 
-
+const Stack = createStackNavigator();
 
 const MapScreen = () => {
-    const Stack = createStackNavigator();
-
-    return (
-        <View>
-            <View style={tw`h-1/2`}>
-                <MapUser />
-        </View>
-        <View style={tw`h-1/2`}>
-            <Stack.Navigator>
-             <Stack.Screen
-                name="NavigateCard"
-                component={NavigateCard}
-                options={{
-                    headerShown: false,
-                }} 
-                />
-             <Stack.Screen
-                name="buscaOpcoesCard"
-                component={buscaOpcoesCard}
-                options={{
-                    headerShown: false,
-                }} 
-                />                 
-                 
-            </Stack.Navigator>
-        </View>
-        </View>
-
-
-    );
+  return (
+    <View style={{ flex: 1 }}>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="NavigateCard" component={NavigateCard} />
+        <Stack.Screen name="buscaOpcoesCard" component={buscaOpcoesCard} />
+      </Stack.Navigator>
+    </View>
+  );
 };
 
 export default MapScreen;
 
-const styles = StyleSheet.create ({});
+const styles = StyleSheet.create({});

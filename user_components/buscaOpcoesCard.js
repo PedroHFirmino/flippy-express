@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, ActivityIndicator, Dimensions, ScrollView } from 'react-native';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useSelector } from 'react-redux';
 import { selectOrigin, selectDestination } from '../slices/navSlice';
 import { GOOGLE_MAPS_APIKEY } from '@env';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const BuscaOpcoesCard = () => {
   const origin = useSelector(selectOrigin);
@@ -10,6 +13,7 @@ const BuscaOpcoesCard = () => {
   const [itemDescription, setItemDescription] = useState('');
   const [error, setError] = useState('');
   const [routeInfo, setRouteInfo] = useState(null);
+  const [routeCoords, setRouteCoords] = useState([]);
   const [loading, setLoading] = useState(false);
   const valorSimulado = 'R$ 25,00';
 
@@ -27,17 +31,48 @@ const BuscaOpcoesCard = () => {
             distance: leg.distance.text,
             duration: leg.duration.text
           });
+          setRouteCoords(decodePolyline(data.routes[0].overview_polyline.points));
         } else {
           setRouteInfo(null);
+          setRouteCoords([]);
         }
       } catch (e) {
         setRouteInfo(null);
+        setRouteCoords([]);
       } finally {
         setLoading(false);
       }
     };
     fetchRoute();
   }, [origin, destination]);
+
+  // Função para decodificar polyline do Google
+  function decodePolyline(encoded) {
+    let points = [];
+    let index = 0, len = encoded.length;
+    let lat = 0, lng = 0;
+    while (index < len) {
+      let b, shift = 0, result = 0;
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      let dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      let dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+      points.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
+    }
+    return points;
+  }
 
   const handleConfirm = () => {
     if (!itemDescription.trim()) {
@@ -46,39 +81,88 @@ const BuscaOpcoesCard = () => {
     }
     setError('');
     Alert.alert('Pedido enviado!', `Item: ${itemDescription}\nOrigem: ${origin?.description}\nDestino: ${destination?.description}`);
-  
+  };
+
+  // Região inicial do mapa
+  const initialRegion = origin && origin.location ? {
+    latitude: origin.location.lat || origin.location.latitude,
+    longitude: origin.location.lng || origin.location.longitude,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  } : {
+    latitude: -23.55052,
+    longitude: -46.633308,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Resumo da Entrega</Text>
-      <View style={styles.infoBox}>
-        <Text style={styles.label}>Origem:</Text>
-        <Text style={styles.value}>{origin?.description || 'Não selecionado'}</Text>
-        <Text style={styles.label}>Destino:</Text>
-        <Text style={styles.value}>{destination?.description || 'Não selecionado'}</Text>
-        <Text style={styles.label}>Valor:</Text>
-        <Text style={styles.value}>{valorSimulado}</Text>
-        {loading ? (
-          <ActivityIndicator color="#00b5f8" style={{marginTop: 10}} />
-        ) : routeInfo && (
-          <View style={styles.routeBox}>
-            <Text style={styles.routeText}>Distância: {routeInfo.distance}</Text>
-            <Text style={styles.routeText}>Tempo estimado: {routeInfo.duration}</Text>
-          </View>
-        )}
+      <View style={styles.mapContainer}>
+        <MapView
+          style={styles.map}
+          initialRegion={initialRegion}
+          region={initialRegion}
+        >
+          {origin && origin.location && (
+            <Marker
+              coordinate={{
+                latitude: origin.location.lat || origin.location.latitude,
+                longitude: origin.location.lng || origin.location.longitude,
+              }}
+              title="Origem"
+              pinColor="green"
+            />
+          )}
+          {destination && destination.location && (
+            <Marker
+              coordinate={{
+                latitude: destination.location.lat || destination.location.latitude,
+                longitude: destination.location.lng || destination.location.longitude,
+              }}
+              title="Destino"
+              pinColor="red"
+            />
+          )}
+          {routeCoords.length > 0 && (
+            <Polyline
+              coordinates={routeCoords}
+              strokeWidth={5}
+              strokeColor="#00b5f8"
+            />
+          )}
+        </MapView>
       </View>
-      <Text style={styles.label}>Descrição do item a ser entregue *</Text>
-      <TextInput
-        style={styles.input}
-        placeholder=""
-        value={itemDescription}
-        onChangeText={setItemDescription}
-      />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <TouchableOpacity style={styles.button} onPress={handleConfirm}>
-        <Text style={styles.buttonText}>Confirmar Pedido</Text>
-      </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.title}>Resumo da Entrega</Text>
+        <View style={styles.infoBox}>
+          <Text style={styles.label}>Origem:</Text>
+          <Text style={styles.value}>{origin?.description || 'Não selecionado'}</Text>
+          <Text style={styles.label}>Destino:</Text>
+          <Text style={styles.value}>{destination?.description || 'Não selecionado'}</Text>
+          <Text style={styles.label}>Valor:</Text>
+          <Text style={styles.value}>{valorSimulado}</Text>
+          {loading ? (
+            <ActivityIndicator color="#00b5f8" style={{marginTop: 10}} />
+          ) : routeInfo && (
+            <View style={styles.routeBox}>
+              <Text style={styles.routeText}>Distância: {routeInfo.distance}</Text>
+              <Text style={styles.routeText}>Tempo estimado: {routeInfo.duration}</Text>
+            </View>
+          )}
+        </View>
+        <Text style={styles.label}>Descrição do item a ser entregue *</Text>
+        <TextInput
+          style={styles.input}
+          placeholder=""
+          value={itemDescription}
+          onChangeText={setItemDescription}
+        />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <TouchableOpacity style={styles.button} onPress={handleConfirm}>
+          <Text style={styles.buttonText}>Confirmar Pedido</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 };
@@ -89,8 +173,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f4f8fb',
+  },
+  mapContainer: {
+    height: SCREEN_HEIGHT * 0.35,
+    width: '100%',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: '#e6f7ff',
+    elevation: 2,
+  },
+  map: {
+    flex: 1,
+  },
+  scrollContent: {
     padding: 24,
-    justifyContent: 'center',
+    paddingBottom: 40,
   },
   title: {
     fontSize: 22,
