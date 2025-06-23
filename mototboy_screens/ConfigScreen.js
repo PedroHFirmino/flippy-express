@@ -6,7 +6,6 @@ import tw from 'twrnc';
 
 const ConfigScreen = () => {
     const navigation = useNavigation();
-    // Aqui você pode preencher com dados reais do usuário
     const [name, setName] = useState('Pedro H. Firmino');
     const [email, setEmail] = useState('pedro@email.com');
     const [phone, setPhone] = useState('(11) 99999-9999');
