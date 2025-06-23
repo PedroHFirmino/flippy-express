@@ -11,17 +11,6 @@ const MotoboyHomeScreen = () => {
     return (
         <SafeAreaView style={tw`bg-white h-full`}>
             <View style={tw`p-5`}>
-                <TouchableOpacity
-                    style={styles.profileButton}
-                    onPress={() => navigation.navigate('ProfileScreen')}>
-                    <Icon
-                        name="user"
-                        type="antdesign"
-                        color="black"
-                        size={24}
-                    />
-                </TouchableOpacity>
-
                 <Image
                     source={require('../assets/Logo.png')}
                     style={{
