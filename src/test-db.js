@@ -1,7 +1,7 @@
 const { testConnection, executeQuery } = require('./database/connection');
 
 async function testDB() {
-    console.log('🔍 Testando conexão com o banco de dados...\n');
+    console.log(' Testando conexão com o banco de dados...\n');
     
     try {
         

@@ -14,22 +14,36 @@ const dbConfig = {
     reconnect: true
 };
 
-// Criar pool de conexões
-const pool = mysql.createPool(dbConfig);
+let pool;
 
-// Testar conexão
+const createPool = () => {
+    if (!pool) {
+        pool = mysql.createPool({
+            ...dbConfig,
+            waitForConnections: true,
+            connectionLimit: 10,
+            queueLimit: 0
+        });
+    }
+    return pool;
+};
+
 const testConnection = async () => {
     try {
-        const connection = await pool.getConnection();
-        console.log('Conexão com o banco de dados estabelecida com sucesso!');
+        const connection = await createPool().getConnection();
+        console.log(' Conexão com o banco de dados estabelecida com sucesso!');
+        console.log(` Banco: ${dbConfig.database}`);
         connection.release();
     } catch (error) {
-        console.error('Erro ao conectar com o banco de dados:', error.message);
-        process.exit(1);
+        console.error(' Erro ao conectar com o banco de dados:', error.message);
     }
 };
 
-// Executar query com tratamento de erro
+const getConnection = () => {
+    return createPool();
+};
+
+// Executar query
 const executeQuery = async (query, params = []) => {
     try {
         const [rows] = await pool.execute(query, params);
@@ -40,7 +54,7 @@ const executeQuery = async (query, params = []) => {
     }
 };
 
-// Executar múltiplas queries em transação
+
 const executeTransaction = async (queries) => {
     const connection = await pool.getConnection();
     try {
@@ -63,8 +77,9 @@ const executeTransaction = async (queries) => {
 };
 
 module.exports = {
-    pool,
     testConnection,
+    getConnection,
+    dbConfig,
     executeQuery,
     executeTransaction
 }; 
