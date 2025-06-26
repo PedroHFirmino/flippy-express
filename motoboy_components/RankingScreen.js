@@ -1,21 +1,69 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, SafeAreaView, Text, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, SafeAreaView, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
 
+const API_URL = Platform.OS === 'android' 
+  ? 'http://192.168.237.64:3000/api'  
+  : 'http://localhost:3000/api'; 
+
 const RankingScreen = () => {
     const navigation = useNavigation();
-    const [selectedPeriod, setSelectedPeriod] = useState('week'); // 'week', 'month', 'year'
+    const [selectedPeriod, setSelectedPeriod] = useState('semanal'); 
+    const [rankingData, setRankingData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    
-    const rankingData = [
-        { id: '1', name: 'João Silva', deliveries: 45, position: 1 },
-        { id: '2', name: 'Maria Santos', deliveries: 42, position: 2 },
-        { id: '3', name: 'Pedro Oliveira', deliveries: 38, position: 3 },
-        { id: '4', name: 'Ana Costa', deliveries: 35, position: 4 },
-        { id: '5', name: 'Carlos Souza', deliveries: 32, position: 5 },
-    ];
+    useEffect(() => {
+        loadRanking();
+    }, [selectedPeriod]);
+
+    const loadRanking = async () => {
+        setLoading(true);
+        try {
+            const url = `${API_URL}/motoboys/ranking?periodo=${selectedPeriod}`;
+            console.log('🔍 Carregando ranking:', url);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            console.log('Status da resposta:', response.status);
+            const data = await response.json();
+            console.log('Dados recebidos:', data);
+
+            if (response.ok) {
+                const rankingData = data.data || [];
+                
+               
+                const processedData = rankingData.map(item => ({
+                    ...item,
+                    total_entregas: item.total_entregas || 0,
+                    avaliacao_media: item.avaliacao_media || 0,
+                    total_ganhos: item.total_ganhos || 0,
+                    posicao: item.posicao || 0
+                }));
+                
+                setRankingData(processedData);
+                console.log(`Ranking carregado: ${processedData.length} motoboys`);
+            } else {
+                console.error('Erro ao carregar ranking:', data.message);
+                Alert.alert('Erro', `Não foi possível carregar o ranking: ${data.message}`);
+            }
+        } catch (error) {
+            console.error(' Erro de conexão:', error);
+            Alert.alert('Erro', 'Erro de conexão ao carregar ranking. Verifique se o servidor está rodando.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePeriodChange = (period) => {
+        setSelectedPeriod(period);
+    };
 
     const renderRankingItem = ({ item, index }) => (
         <View style={[
@@ -25,12 +73,27 @@ const RankingScreen = () => {
             index === 2 && styles.thirdPlace
         ]}>
             <View style={styles.positionContainer}>
-                <Text style={styles.positionText}>{item.position}º</Text>
+                <Text style={styles.positionText}>{item.posicao}º</Text>
             </View>
             <View style={styles.driverInfo}>
-                <Text style={styles.driverName}>{item.name}</Text>
-                <Text style={styles.deliveryCount}>{item.deliveries} entregas</Text>
+                <Text style={styles.driverName}>{item.nome}</Text>
+                <Text style={styles.deliveryCount}>{item.total_entregas || 0} entregas</Text>
+                <Text style={styles.ratingText}> {item.avaliacao_media ? parseFloat(item.avaliacao_media).toFixed(1) : '0.0'}</Text>
+                <Text style={styles.earningsText}>R$ {item.total_ganhos ? parseFloat(item.total_ganhos).toFixed(2) : '0.00'}</Text>
             </View>
+        </View>
+    );
+
+    const renderEmptyState = () => (
+        <View style={styles.emptyContainer}>
+            <Icon
+                name="emoji-events"
+                type="material"
+                color="#ccc"
+                size={64}
+            />
+            <Text style={styles.emptyText}>Nenhum motoboy encontrado</Text>
+            <Text style={styles.emptySubtext}>Ainda não há dados de entregas para este período</Text>
         </View>
     );
 
@@ -52,34 +115,44 @@ const RankingScreen = () => {
 
             <View style={styles.periodSelector}>
                 <TouchableOpacity
-                    style={[styles.periodButton, selectedPeriod === 'week' && styles.selectedPeriod]}
-                    onPress={() => setSelectedPeriod('week')}>
-                    <Text style={[styles.periodText, selectedPeriod === 'week' && styles.selectedPeriodText]}>
+                    style={[styles.periodButton, selectedPeriod === 'semanal' && styles.selectedPeriod]}
+                    onPress={() => handlePeriodChange('semanal')}>
+                    <Text style={[styles.periodText, selectedPeriod === 'semanal' && styles.selectedPeriodText]}>
                         Semana
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.periodButton, selectedPeriod === 'month' && styles.selectedPeriod]}
-                    onPress={() => setSelectedPeriod('month')}>
-                    <Text style={[styles.periodText, selectedPeriod === 'month' && styles.selectedPeriodText]}>
+                    style={[styles.periodButton, selectedPeriod === 'mensal' && styles.selectedPeriod]}
+                    onPress={() => handlePeriodChange('mensal')}>
+                    <Text style={[styles.periodText, selectedPeriod === 'mensal' && styles.selectedPeriodText]}>
                         Mês
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.periodButton, selectedPeriod === 'year' && styles.selectedPeriod]}
-                    onPress={() => setSelectedPeriod('year')}>
-                    <Text style={[styles.periodText, selectedPeriod === 'year' && styles.selectedPeriodText]}>
+                    style={[styles.periodButton, selectedPeriod === 'anual' && styles.selectedPeriod]}
+                    onPress={() => handlePeriodChange('anual')}>
+                    <Text style={[styles.periodText, selectedPeriod === 'anual' && styles.selectedPeriodText]}>
                         Ano
                     </Text>
                 </TouchableOpacity>
             </View>
 
-            <FlatList
-                data={rankingData}
-                renderItem={renderRankingItem}
-                keyExtractor={item => item.id}
-                contentContainerStyle={styles.listContainer}
-            />
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#00b5f8" />
+                    <Text style={styles.loadingText}>Carregando ranking...</Text>
+                </View>
+            ) : (
+                <FlatList
+                    data={rankingData}
+                    renderItem={renderRankingItem}
+                    keyExtractor={item => item.id.toString()}
+                    contentContainerStyle={styles.listContainer}
+                    ListEmptyComponent={renderEmptyState}
+                    refreshing={loading}
+                    onRefresh={loadRanking}
+                />
+            )}
         </SafeAreaView>
     );
 };
@@ -96,7 +169,6 @@ const styles = StyleSheet.create({
         padding: 5,
     },
     headerTitle: {
-        
         fontSize: 20,
         fontWeight: 'bold',
         marginLeft: 15,
@@ -124,8 +196,37 @@ const styles = StyleSheet.create({
     selectedPeriodText: {
         color: 'white',
     },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: '#666',
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 50,
+    },
+    emptyText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#666',
+        marginTop: 10,
+    },
+    emptySubtext: {
+        fontSize: 14,
+        color: '#999',
+        marginTop: 5,
+        textAlign: 'center',
+    },
     listContainer: {
         padding: 15,
+        flexGrow: 1,
     },
     rankingItem: {
         flexDirection: 'row',
@@ -176,7 +277,17 @@ const styles = StyleSheet.create({
         color: '#666',
         marginTop: 4,
     },
-
+    ratingText: {
+        fontSize: 12,
+        color: '#FFA500',
+        marginTop: 2,
+    },
+    earningsText: {
+        fontSize: 12,
+        color: '#4CAF50',
+        marginTop: 2,
+        fontWeight: 'bold',
+    },
 });
 
-export default RankingScreen; 
+export default RankingScreen;

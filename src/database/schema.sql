@@ -156,6 +156,8 @@ INSERT INTO configuracoes_sistema (chave, valor, descricao) VALUES
 ('comissao_motoboy', '80', 'Percentual de comissão para motoboys (%)'),
 ('valor_minimo_entrega', '5.00', 'Valor mínimo para entrega'),
 ('taxa_entrega_base', '3.00', 'Taxa base de entrega'),
+('preco_por_km', '2.00', 'Preço por quilômetro de entrega (R$)'),
+('taxa_aplicativo', '1.50', 'Taxa fixa do aplicativo (R$)'),
 ('raio_busca_km', '10', 'Raio de busca para motoboys (km)'),
 ('tempo_maximo_espera', '300', 'Tempo máximo de espera para aceite (segundos)');
 
