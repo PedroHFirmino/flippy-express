@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const { testConnection } = require('./database/connection');
 
-// rotas
+
 const userRoutes = require('./routes/userRoutes');
 const motoboyRoutes = require('./routes/motoboyRoutes');
 const pedidoRoutes = require('./routes/pedidoRoutes');
@@ -24,12 +24,12 @@ app.use(express.urlencoded({ extended: true }));
 
 testConnection();
 
-// Rotas
+
 app.use('/api/users', userRoutes);
 app.use('/api/motoboys', motoboyRoutes);
 app.use('/api/pedidos', pedidoRoutes);
 
-// Rota de teste
+
 app.get('/ping', (req, res) => {
     res.json({
         success: true,
@@ -38,7 +38,7 @@ app.get('/ping', (req, res) => {
     });
 });
 
-// erros
+
 app.use((err, req, res, next) => {
     console.error('Erro não tratado:', err);
     res.status(500).json({
@@ -46,6 +46,8 @@ app.use((err, req, res, next) => {
         message: 'Erro interno do servidor'
     });
 });
+
+
 app.use('*', (req, res) => {
     res.status(404).json({
         success: false,
@@ -54,7 +56,7 @@ app.use('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(` Servidor Flippy Express rodando na porta ${PORT}`);
+    console.log(`Servidor Flippy Express rodando na porta ${PORT}`);
     console.log(`API disponível em: http://localhost:${PORT}`);
-    console.log(` Health check: http://localhost:${PORT}/ping`);
+    console.log(`Health check: http://localhost:${PORT}/ping`);
 }); 

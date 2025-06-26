@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import {View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Platform} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const API_URL = Platform.OS === 'android' 
@@ -44,7 +45,8 @@ export default function SignInMotoB () {
             console.log('Resposta da API:', data);
 
             if (response.ok) {
- 
+                
+                await AsyncStorage.setItem('motoboyToken', data.data.token);
                 
                 Alert.alert(
                     'Sucesso!', 

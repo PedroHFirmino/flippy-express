@@ -22,7 +22,7 @@ const motoboyController = {
                 senha
             } = req.body;
 
-            // Validações básicas
+            // Validações 
             if (!nome || !telefone || !cpf || !data_nascimento || !email || !senha) {
                 return res.status(400).json({
                     success: false,
@@ -61,7 +61,7 @@ const motoboyController = {
            
             const hashedPassword = await bcrypt.hash(senha, 10);
 
-            // Inserrt
+            // Inserrt na table
             const [result] = await pool.execute(
                 `INSERT INTO motoboys (
                     nome, telefone, sexo, cpf, data_nascimento,
@@ -77,7 +77,7 @@ const motoboyController = {
 
             res.status(201).json({
                 success: true,
-                message: 'Motoboy registrado com sucesso.',
+                message: 'Motoboy registrado com sucesso. Aguardando aprovação.',
                 data: {
                     id: result.insertId,
                     nome,
@@ -123,7 +123,7 @@ const motoboyController = {
 
             const motoboy = motoboys[0];
 
-           
+            
             const isValidPassword = await bcrypt.compare(senha, motoboy.senha);
 
             if (!isValidPassword) {
@@ -133,7 +133,7 @@ const motoboyController = {
                 });
             }
 
-           
+            
             const token = jwt.sign(
                 { 
                     id: motoboy.id, 
@@ -253,7 +253,7 @@ const motoboyController = {
         }
     },
 
-    // Obter motoboys disponíveis
+    
     async getAvailable(req, res) {
         try {
             const pool = getConnection();
