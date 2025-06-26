@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 import { ScrollView } from 'react-native';
 
-export default function SignUpMotoB() {
 
+const API_URL = Platform.OS === 'android' 
+  ? 'http://192.168.237.64:3000/api'  
+  : 'http://localhost:3000/api'; 
+
+export default function SignUpMotoB() {
   const navigation = useNavigation();
   const [nome, setNome] = useState('');
   const [selectedGender, setSelectedGender] = useState('');
@@ -20,9 +24,10 @@ export default function SignUpMotoB() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmSenha, setConfirmSenha] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleCadastro = () => {
-
+  const handleCadastro = async () => {
+    // Validações básicas
     if (
       !nome ||
       !selectedGender ||
@@ -41,14 +46,78 @@ export default function SignUpMotoB() {
       return;
     }
 
-  
     if (senha !== confirmSenha) {
       Alert.alert('Erro', 'As senhas não coincidem!');
       return;
     }
 
-  
-    navigation.navigate('SuccessScreenMotoB');
+    if (senha.length < 6) {
+      Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres!');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const motoboyData = {
+        nome,
+        telefone,
+        sexo: selectedGender,
+        cpf,
+        data_nascimento: nascimento,
+        endereco,
+        cep,
+        cidade,
+        estado,
+        email,
+        senha
+      };
+
+      console.log('Tentando conectar com:', `${API_URL}/motoboys/register`);
+      console.log('Dados:', motoboyData);
+
+      const response = await fetch(`${API_URL}/motoboys/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(motoboyData)
+      });
+
+      const data = await response.json();
+      console.log('Resposta da API:', data);
+
+      if (response.ok) {
+        Alert.alert(
+          'Sucesso!', 
+          'Motoboy cadastrado com sucesso!',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('SuccessScreenMotoB')
+            }
+          ]
+        );
+      } else {
+        Alert.alert('Erro', data.message || 'Erro ao cadastrar motoboy');
+      }
+
+    } catch (error) {
+      console.error('Erro na requisição:', error);
+      Alert.alert(
+        'Erro de Conexão', 
+        `Não foi possível conectar ao servidor.\n\nURL tentada: ${API_URL}\n\nVerifique se:\n1. O servidor está rodando\n2. O IP está correto\n3. Ambos estão na mesma rede`,
+        [
+          { text: 'OK' },
+          { 
+            text: 'Testar Conexão', 
+            onPress: () => testConnection() 
+          }
+        ]
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
 
@@ -58,105 +127,125 @@ export default function SignUpMotoB() {
         <Text style={styles.message}>Cadastre-se</Text>
       </Animatable.View>
 
-<ScrollView style={{flex:1}}
-            contentContainerStyle={{ paddingBottom: 50 }}>
-      <Animatable.View animation="fadeInUp" style={styles.containerForm}>
-        <Text style={styles.title}>Nome Completo</Text>
-        <TextInput 
-          placeholder="Digite seu nome"
-          style={styles.input}
-          onChange={setNome}
-        />
+      <ScrollView style={{flex:1}}
+                  contentContainerStyle={{ paddingBottom: 50 }}>
+        <Animatable.View animation="fadeInUp" style={styles.containerForm}>
+          <Text style={styles.title}>Nome Completo</Text>
+          <TextInput 
+            placeholder="Digite seu nome"
+            style={styles.input}
+            value={nome}
+            onChangeText={setNome}
+          />
 
-        <Text style={styles.title}>Sexo</Text>
-        <Picker
-          selectedValue={selectedGender}
-          onValueChange={(itemValue) => setSelectedGender(itemValue)}
-          style={styles.picker}
+          <Text style={styles.title}>Sexo</Text>
+          <Picker
+            selectedValue={selectedGender}
+            onValueChange={(itemValue) => setSelectedGender(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Selecione o sexo" value="" />
+            <Picker.Item label="Masculino" value="masculino" />
+            <Picker.Item label="Feminino" value="feminino" />
+            <Picker.Item label="Outro" value="outro" />
+          </Picker>
 
-        >
-          <Picker.Item label="Selecione o sexo" value="" />
-          <Picker.Item label="Masculino" value="masculino" />
-          <Picker.Item label="Feminino" value="feminino" />
-          <Picker.Item label="Outro" value="outro" />
-        </Picker>
+          <Text style={styles.title}>CPF</Text>
+          <TextInput 
+            placeholder="Digite seu CPF"
+            style={styles.input}
+            value={cpf}
+            onChangeText={setCpf}
+          />
 
-        <Text style={styles.title}>CPF</Text>
-        <TextInput 
-          placeholder="Digite seu CPF"
-          style={styles.input}
-          onChangeText={setCpf}
-        />
-        <Text style={styles.title}>Telefone</Text>
-        <TextInput 
-          placeholder="Digite seu telefone"
-          style={styles.input}
-          onChangeText={setTelefone}
-        />
-        <Text style={styles.title}>Data de Nascimento</Text>
-        <TextInput 
-          placeholder="Digite sua data de nascimento"
-          style={styles.input}
-          onChangeText={setNascimento}
-        />
-        <Text style={styles.title}>Endereço</Text>
-        <TextInput 
-          placeholder="Digite seu endereço - nº"
-          style={styles.input}
-          onChangeText={setEndereco}
-        />
+          <Text style={styles.title}>Telefone</Text>
+          <TextInput 
+            placeholder="Digite seu telefone"
+            style={styles.input}
+            value={telefone}
+            onChangeText={setTelefone}
+            keyboardType="phone-pad"
+          />
 
-        <Text style={styles.title}>CEP</Text>
-        <TextInput 
-          placeholder="Digite seu CEP"
-          style={styles.input}
-          onChangeText={setCep}
-        />
+          <Text style={styles.title}>Data de Nascimento</Text>
+          <TextInput 
+            placeholder="DD-MM-AA"
+            style={styles.input}
+            value={nascimento}
+            onChangeText={setNascimento}
+          />
 
-      <Text style={styles.title}>Cidade</Text>
-        <TextInput 
-          placeholder="Digite sua cidade"
-          style={styles.input}
-          onChangeText={setCidade}
-        />
+          <Text style={styles.title}>Endereço</Text>
+          <TextInput 
+            placeholder="Digite seu endereço - nº"
+            style={styles.input}
+            value={endereco}
+            onChangeText={setEndereco}
+          />
 
-      <Text style={styles.title}>Estado</Text>
-        <TextInput 
-          placeholder="Digite seu estado"
-          style={styles.input}
-          onChangeText={setEstado}
-        />        
+          <Text style={styles.title}>CEP</Text>
+          <TextInput 
+            placeholder="Digite seu CEP"
+            style={styles.input}
+            value={cep}
+            onChangeText={setCep}
+            keyboardType="numeric"
+          />
 
-        <Text style={styles.title}>E-mail</Text>
-        <TextInput 
-          placeholder="Digite seu E-mail"
-          style={styles.input}
-          onChangeText={setEmail}
-        />
+          <Text style={styles.title}>Cidade</Text>
+          <TextInput 
+            placeholder="Digite sua cidade"
+            style={styles.input}
+            value={cidade}
+            onChangeText={setCidade}
+          />
 
-        <Text style={styles.title}>Senha</Text>
-        <TextInput 
-          placeholder="Digite uma senha"
-          style={styles.input}
-          onChangeText={setSenha}
-          secureTextEntry
-        />
-        <Text style={styles.title}>Confirme sua senha</Text>
-        <TextInput 
-          placeholder="Confirme sua senha"
-          style={styles.input}
-          onChangeText={setConfirmSenha}
-          secureTextEntry
-        />
-      <View style={{ alignItems: 'center' }}>
-        <TouchableOpacity 
-          onPress={handleCadastro}
-          style={styles.button}
-        >
-        <Text style={styles.buttonText}>Cadastrar</Text>
-      </TouchableOpacity>
-    </View>
-      </Animatable.View>
+          <Text style={styles.title}>Estado</Text>
+          <TextInput 
+            placeholder="Digite seu estado"
+            style={styles.input}
+            value={estado}
+            onChangeText={setEstado}
+          />        
+
+          <Text style={styles.title}>E-mail</Text>
+          <TextInput 
+            placeholder="Digite seu E-mail"
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+
+          <Text style={styles.title}>Senha</Text>
+          <TextInput 
+            placeholder="Digite uma senha"
+            style={styles.input}
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry
+          />
+
+          <Text style={styles.title}>Confirme sua senha</Text>
+          <TextInput 
+            placeholder="Confirme sua senha"
+            style={styles.input}
+            value={confirmSenha}
+            onChangeText={setConfirmSenha}
+            secureTextEntry
+          />
+
+          <TouchableOpacity 
+            onPress={handleCadastro}
+            style={[styles.button, loading && styles.buttonDisabled]}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? 'Cadastrando...' : 'Cadastrar'}
+            </Text>
+          </TouchableOpacity>
+        </Animatable.View>
       </ScrollView>
     </View>
   );
@@ -200,14 +289,15 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#00b5f8',
-    width: '70%',
+    width: '100%',
     borderRadius: 4,
     paddingVertical: 8,
     marginTop: 14,
     justifyContent: 'center',
     alignItems: 'center',
-
-  
+  },
+  buttonDisabled: {
+    backgroundColor: '#ccc',
   },
   buttonText: {
     color: 'white',

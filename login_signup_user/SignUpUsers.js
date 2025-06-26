@@ -4,9 +4,9 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView,
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 
-// URL da API - IP atualizado para sua rede
+
 const API_URL = Platform.OS === 'android' 
-  ? 'http://192.168.237.64:3000/api'  // IP da sua máquina
+  ? 'http://192.168.237.64:3000/api' 
   : 'http://localhost:3000/api'; 
 
 export default function SignUpUsers() {
