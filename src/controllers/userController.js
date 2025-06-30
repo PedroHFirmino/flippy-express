@@ -203,6 +203,14 @@ const userController = {
                 }
             });
 
+            // Permitir alteração de senha
+            let senhaHash = null;
+            if (updateData.senha) {
+                const bcrypt = require('bcryptjs');
+                senhaHash = await bcrypt.hash(updateData.senha, 10);
+                fieldsToUpdate['senha'] = senhaHash;
+            }
+
             if (Object.keys(fieldsToUpdate).length === 0) {
                 return res.status(400).json({
                     success: false,

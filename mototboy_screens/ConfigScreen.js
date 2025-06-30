@@ -83,14 +83,13 @@ const ConfigScreen = () => {
                 telefone: phone.trim()
             };
 
-
             if (password.trim()) {
                 if (password.length < 6) {
                     Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres');
                     setLoading(false);
                     return;
                 }
-
+                updateData.senha = password;
             }
 
             const response = await fetch(`${API_URL}/motoboys/profile`, {

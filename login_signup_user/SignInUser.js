@@ -1,22 +1,64 @@
 import { DefaultTheme } from '@react-navigation/native';
 // import React, { useState } from 'react';
-import {View, Text, StyleSheet, TextInput, TouchableOpacity, Alert} from 'react-native';
+import {View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Platform} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_URL = Platform.OS === 'android' 
+  ? 'http://192.168.237.64:3000/api'  
+  : 'http://localhost:3000/api'; 
 
 export default function SignInUser () {
     const navigation = useNavigation();
-        const [email, setEmail] = useState('');
-        const [password, setPassword] = useState('');
-    
-        const handleLogin = () => {
-            if (email && password) {
-                navigation.navigate('HomeScreen');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleLogin = async () => {
+        if (!email || !password) {
+            Alert.alert('Erro', 'Por favor, preencha todos os campos');
+            return;
+        }
+        setLoading(true);
+        try {
+            const loginData = {
+                email,
+                senha: password
+            };
+            const response = await fetch(`${API_URL}/users/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loginData)
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                await AsyncStorage.setItem('userToken', data.data.token);
+                Alert.alert(
+                    'Sucesso!',
+                    'Login realizado com sucesso!',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => navigation.navigate('HomeScreen')
+                        }
+                    ]
+                );
             } else {
-                Alert.alert('Erro', 'Por favor, preencha todos os campos');
+                Alert.alert('Erro', data.message || 'Email ou senha inválidos');
             }
-        };
+        } catch (error) {
+            Alert.alert(
+                'Erro de Conexão',
+                `Não foi possível conectar ao servidor.\n\nURL tentada: ${API_URL}\n\nVerifique se:\n1. O servidor está rodando\n2. O IP está correto\n3. Ambos estão na mesma rede`
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <View style={styles.container}>
             <Animatable.View 
@@ -44,10 +86,10 @@ export default function SignInUser () {
                     onChangeText={setPassword}
                 />
 
-                <TouchableOpacity style={styles.button}
-                    onPress={handleLogin}>
-                    <Text style={styles.buttonText}>Acessar</Text>
-
+                <TouchableOpacity style={[styles.button, loading && styles.buttonDisabled]}
+                    onPress={handleLogin}
+                    disabled={loading}>
+                    <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Acessar'}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 
@@ -122,7 +164,9 @@ const styles = StyleSheet.create ({
 
     registerText:{
 
-    }
-
+    },
+    buttonDisabled: {
+        backgroundColor: '#ccc',
+    },
 
 })

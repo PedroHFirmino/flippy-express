@@ -1,18 +1,82 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Image, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Image, ScrollView, Platform } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_URL = Platform.OS === 'android' 
+  ? 'http://192.168.237.64:3000/api'  
+  : 'http://localhost:3000/api'; 
 
 const ProfileScreen = () => {
     const navigation = useNavigation();
-    const [name, setName] = useState('Pedro H. Firmino');
-    const [email, setEmail] = useState('pedro@email.com');
-    const [phone, setPhone] = useState('(11) 99999-9999');
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSave = () => {
-        Alert.alert('Sucesso', 'Dados atualizados com sucesso!');
+    useEffect(() => {
+        const fetchProfile = async () => {
+            setLoading(true);
+            try {
+                const token = await AsyncStorage.getItem('userToken');
+                const response = await fetch(`${API_URL}/users/profile`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    setName(data.data.nome || '');
+                    setEmail(data.data.email || '');
+                    setPhone(data.data.telefone || '');
+                } else {
+                    Alert.alert('Erro', data.message || 'Erro ao buscar perfil');
+                }
+            } catch (error) {
+                Alert.alert('Erro', 'Erro ao conectar com o servidor');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProfile();
+    }, []);
+
+    const handleSave = async () => {
+        setLoading(true);
+        try {
+            const token = await AsyncStorage.getItem('userToken');
+            const updateData = {
+                nome: name,
+                telefone: phone,
+            };
+            if (password) {
+                updateData.senha = password;
+            }
+            const response = await fetch(`${API_URL}/users/profile`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updateData),
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                Alert.alert('Sucesso', 'Dados atualizados com sucesso!');
+                setPassword(''); // Limpa o campo senha após sucesso
+            } else {
+                Alert.alert('Erro', data.message || 'Erro ao atualizar perfil');
+            }
+        } catch (error) {
+            Alert.alert('Erro', 'Erro ao conectar com o servidor');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -38,15 +102,14 @@ const ProfileScreen = () => {
                         placeholder="Digite seu nome"
                         value={name}
                         onChangeText={setName}
+                        editable={!loading}
                     />
                     <Text style={styles.label}>E-mail</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Digite seu e-mail"
                         value={email}
-                        onChangeText={setEmail}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
+                        editable={false}
                     />
                     <Text style={styles.label}>Telefone</Text>
                     <TextInput
@@ -55,6 +118,7 @@ const ProfileScreen = () => {
                         value={phone}
                         onChangeText={setPhone}
                         keyboardType="phone-pad"
+                        editable={!loading}
                     />
                     <Text style={styles.label}>Senha</Text>
                     <TextInput
@@ -64,8 +128,8 @@ const ProfileScreen = () => {
                         onChangeText={setPassword}
                         secureTextEntry
                     />
-                    <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                        <Text style={styles.saveButtonText}>Salvar Alterações</Text>
+                    <TouchableOpacity style={[styles.saveButton, loading && {backgroundColor:'#ccc'}]} onPress={handleSave} disabled={loading}>
+                        <Text style={styles.saveButtonText}>{loading ? 'Salvando...' : 'Salvar Alterações'}</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
