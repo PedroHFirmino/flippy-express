@@ -21,6 +21,7 @@ import MotoboyMapScreen from './mototboy_screens/MotoboyMapScreen';
 import MotoboyHomeScreen from './mototboy_screens/MotoboyHomeScreen';
 import RankingScreen from './motoboy_components/RankingScreen';
 import ConfigScreen from './mototboy_screens/ConfigScreen';
+import PagamentoPixScreen from './user_screens/PagamentoPixScreen';
 
 
 
@@ -144,6 +145,13 @@ export default function App() {
               headerShown:false,
             }}
           
+          />
+          <Stack.Screen 
+            name='PagamentoPix'
+            component={PagamentoPixScreen}
+            options={{
+              headerShown: false,
+            }}
           />
 
 

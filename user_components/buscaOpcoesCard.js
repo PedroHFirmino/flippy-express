@@ -4,6 +4,7 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useSelector } from 'react-redux';
 import { selectOrigin, selectDestination } from '../slices/navSlice';
 import { GOOGLE_MAPS_APIKEY } from '@env';
+import { useNavigation } from '@react-navigation/native';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -16,6 +17,7 @@ const BuscaOpcoesCard = () => {
   const [routeCoords, setRouteCoords] = useState([]);
   const [loading, setLoading] = useState(false);
   const valorSimulado = 'R$ 25,00';
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchRoute = async () => {
@@ -46,7 +48,7 @@ const BuscaOpcoesCard = () => {
     fetchRoute();
   }, [origin, destination]);
 
-  // Função para decodificar polyline do Google
+  
   function decodePolyline(encoded) {
     let points = [];
     let index = 0, len = encoded.length;
@@ -80,7 +82,7 @@ const BuscaOpcoesCard = () => {
       return;
     }
     setError('');
-    Alert.alert('Pedido enviado!', `Item: ${itemDescription}\nOrigem: ${origin?.description}\nDestino: ${destination?.description}`);
+    navigation.navigate('PagamentoPix');
   };
 
   // Região inicial do mapa
