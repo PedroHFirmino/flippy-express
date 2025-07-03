@@ -21,6 +21,7 @@ import MotoboyMapScreen from './mototboy_screens/MotoboyMapScreen';
 import MotoboyHomeScreen from './mototboy_screens/MotoboyHomeScreen';
 import RankingScreen from './motoboy_components/RankingScreen';
 import ConfigScreen from './mototboy_screens/ConfigScreen';
+import SolicitarSaqueScreen from './mototboy_screens/SolicitarSaqueScreen';
 import PagamentoPixScreen from './user_screens/PagamentoPixScreen';
 
 
@@ -145,6 +146,13 @@ export default function App() {
               headerShown:false,
             }}
           
+          />
+          <Stack.Screen
+            name='SolicitarSaque'
+            component={SolicitarSaqueScreen}
+            options={{
+              headerShown: false,
+            }}
           />
           <Stack.Screen 
             name='PagamentoPix'

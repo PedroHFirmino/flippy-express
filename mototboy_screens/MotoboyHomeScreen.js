@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, SafeAreaView, Image, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, SafeAreaView, Image, TouchableOpacity, Text, Alert } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
@@ -50,6 +50,12 @@ const MotoboyHomeScreen = () => {
                     <Text style={styles.startButtonText}>Iniciar Trabalho</Text>
                 </TouchableOpacity>
 
+                {/* Campanha da semana */}
+                <View style={styles.campanhaContainer}>
+                    <Text style={styles.campanhaTitulo}>Campanha da semana:</Text>
+                    <Text style={styles.campanhaDescricao}>Vale uma troca de óleo.</Text>
+                </View>
+
                 <View style={styles.menuContainer}>
                     <TouchableOpacity 
                         style={styles.menuItem}
@@ -86,6 +92,12 @@ const MotoboyHomeScreen = () => {
                         <Text style={styles.menuText}>Configurações</Text>
                     </TouchableOpacity>
                 </View>
+
+                <TouchableOpacity
+                    style={styles.withdrawButton}
+                    onPress={() => navigation.navigate('SolicitarSaque')}>
+                    <Text style={styles.withdrawButtonText}>Solicitar Saque</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -153,6 +165,18 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
+    withdrawButton: {
+        backgroundColor: '#00b5f8',
+        padding: 15,
+        borderRadius: 10,
+        marginTop: 15,
+        alignItems: 'center',
+    },
+    withdrawButtonText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
     menuContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
@@ -168,6 +192,24 @@ const styles = StyleSheet.create({
         marginTop: 8,
         fontSize: 14,
         color: '#666',
+    },
+    campanhaContainer: {
+        marginTop: 20,
+        marginBottom: 3,
+        backgroundColor: '#f8f9fa',
+        borderRadius: 10,
+        padding: 10,
+        alignItems: 'center',
+    },
+    campanhaTitulo: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#00b5f8',
+        marginBottom: 4,
+    },
+    campanhaDescricao: {
+        fontSize: 15,
+        color: '#333',
     },
 });
 

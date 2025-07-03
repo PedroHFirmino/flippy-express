@@ -14,6 +14,7 @@ router.get('/testar-calculo-precos', motoboyController.testarCalculoPrecos);
 
 router.get('/profile', verifyToken, verifyMotoboy, motoboyController.getProfile);
 router.put('/profile', verifyToken, verifyMotoboy, motoboyController.updateProfile);
+router.post('/solicitar-saque', verifyToken, verifyMotoboy, motoboyController.solicitarSaque);
 
 
 router.put('/stats', motoboyController.updateStats);

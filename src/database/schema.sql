@@ -151,6 +151,23 @@ CREATE TABLE sessoes (
     FOREIGN KEY (motoboy_id) REFERENCES motoboys(id) ON DELETE CASCADE
 );
 
+-- Tabela de solicitações de saque
+CREATE TABLE solicitacoes_saque (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    motoboy_id INT NOT NULL,
+    nome_solicitante VARCHAR(255) NOT NULL,
+    chave_pix VARCHAR(255) NOT NULL,
+    banco VARCHAR(100) NOT NULL,
+    valor_disponivel DECIMAL(10,2) NOT NULL,
+    valor_solicitado DECIMAL(10,2) NULL,
+    status ENUM('pendente', 'aprovada', 'rejeitada', 'processada') DEFAULT 'pendente',
+    observacoes TEXT NULL,
+    data_processamento TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (motoboy_id) REFERENCES motoboys(id) ON DELETE CASCADE
+);
+
 -- Inserir configurações padrão do sistema
 INSERT INTO configuracoes_sistema (chave, valor, descricao) VALUES
 ('comissao_motoboy', '80', 'Percentual de comissão para motoboys (%)'),
@@ -161,19 +178,3 @@ INSERT INTO configuracoes_sistema (chave, valor, descricao) VALUES
 ('raio_busca_km', '10', 'Raio de busca para motoboys (km)'),
 ('tempo_maximo_espera', '300', 'Tempo máximo de espera para aceite (segundos)');
 
--- Índices para melhor performance
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_cpf_cnpj ON users(cpf_cnpj);
-CREATE INDEX idx_motoboys_email ON motoboys(email);
-CREATE INDEX idx_motoboys_cpf ON motoboys(cpf);
-CREATE INDEX idx_motoboys_status ON motoboys(status);
-CREATE INDEX idx_pedidos_status ON pedidos(status);
-CREATE INDEX idx_pedidos_user_id ON pedidos(user_id);
-CREATE INDEX idx_pedidos_motoboy_id ON pedidos(motoboy_id);
-CREATE INDEX idx_pedidos_data_pedido ON pedidos(data_pedido);
-CREATE INDEX idx_historico_entregas_data ON historico_entregas(data_entrega);
-CREATE INDEX idx_ganhos_motoboy_data ON ganhos_motoboy(data_ganho);
-CREATE INDEX idx_ranking_motoboy_periodo_data ON ranking_motoboy(periodo, data_ranking);
-CREATE INDEX idx_notificacoes_lida ON notificacoes(lida);
-CREATE INDEX idx_sessoes_token ON sessoes(token);
-CREATE INDEX idx_sessoes_expira_em ON sessoes(expira_em); 

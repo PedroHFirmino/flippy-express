@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { getConnection } = require('../database/connection');
 const { calcularValorEntrega, calcularDistancia } = require('../utils/priceCalculator');
+const emailService = require('../utils/emailService');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'flippy-secret-key';
 
@@ -632,6 +633,82 @@ const motoboyController = {
 
         } catch (error) {
             console.error('Erro ao testar cálculo de preços:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erro interno do servidor'
+            });
+        }
+    },
+
+    // Solicitar saque
+    async solicitarSaque(req, res) {
+        try {
+            const motoboyId = req.user.id;
+            const { nome, chavePix, banco } = req.body;
+
+            if (!nome || !chavePix || !banco) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Nome, chave PIX e banco são obrigatórios'
+                });
+            }
+
+            const pool = getConnection();
+
+            // Buscar dados do motoboy
+            const [motoboys] = await pool.execute(
+                'SELECT nome, email, total_ganhos FROM motoboys WHERE id = ?',
+                [motoboyId]
+            );
+
+            if (motoboys.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Motoboy não encontrado'
+                });
+            }
+
+            const motoboy = motoboys[0];
+
+            // Salvar solicitação no banco
+            const [result] = await pool.execute(
+                `INSERT INTO solicitacoes_saque (
+                    motoboy_id, nome_solicitante, chave_pix, banco, 
+                    valor_disponivel, status, created_at
+                ) VALUES (?, ?, ?, ?, ?, 'pendente', NOW())`,
+                [motoboyId, nome, chavePix, banco, motoboy.total_ganhos || 0]
+            );
+
+            // Enviar e-mail
+            const emailData = {
+                nomeMotoboy: motoboy.nome,
+                emailMotoboy: motoboy.email,
+                nomeSolicitante: nome,
+                chavePix: chavePix,
+                banco: banco,
+                valorDisponivel: Number(motoboy.total_ganhos || 0),
+                dataSolicitacao: new Date().toLocaleString('pt-BR'),
+                idSolicitacao: result.insertId
+            };
+
+            const emailResult = await emailService.enviarSolicitacaoSaque(emailData);
+            
+            if (!emailResult.success) {
+                console.error('Erro ao enviar e-mail:', emailResult.error);
+            
+            }
+
+            res.json({
+                success: true,
+                message: 'Solicitação de saque enviada com sucesso',
+                data: {
+                    id: result.insertId,
+                    valor_disponivel: motoboy.total_ganhos || 0
+                }
+            });
+
+        } catch (error) {
+            console.error('Erro ao solicitar saque:', error);
             res.status(500).json({
                 success: false,
                 message: 'Erro interno do servidor'
