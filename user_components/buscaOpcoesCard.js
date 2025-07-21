@@ -3,8 +3,9 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, ActivityInd
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useSelector } from 'react-redux';
 import { selectOrigin, selectDestination } from '../slices/navSlice';
-import { GOOGLE_MAPS_APIKEY } from '@env';
+import { GOOGLE_MAPS_API_KEY } from '@env';
 import { useNavigation } from '@react-navigation/native';
+import { calcularValorEntrega } from '../src/utils/priceCalculator';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -16,31 +17,62 @@ const BuscaOpcoesCard = () => {
   const [routeInfo, setRouteInfo] = useState(null);
   const [routeCoords, setRouteCoords] = useState([]);
   const [loading, setLoading] = useState(false);
-  const valorSimulado = 'R$ 25,00';
+  const [valorEntrega, setValorEntrega] = useState(null);
   const navigation = useNavigation();
 
   useEffect(() => {
     const fetchRoute = async () => {
-      if (!origin || !destination) return;
+      if (!origin || !destination) {
+        console.log('Origem ou destino não definidos.');
+        return;
+      }
+      console.log('Origem:', JSON.stringify(origin, null, 2));
+      console.log('Destino:', JSON.stringify(destination, null, 2));
+
       setLoading(true);
+      setValorEntrega(null); // Limpar valor anterior
+
       try {
-        const response = await fetch(
-          `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.location.lat || origin.location.latitude},${origin.location.lng || origin.location.longitude}&destination=${destination.location.lat || destination.location.latitude},${destination.location.lng || destination.location.longitude}&key=${GOOGLE_MAPS_APIKEY}&language=pt-BR`);
+        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.location.lat || origin.location.latitude},${origin.location.lng || origin.location.longitude}&destination=${destination.location.lat || destination.location.latitude},${destination.location.lng || destination.location.longitude}&key=${GOOGLE_MAPS_API_KEY}&language=pt-BR`;
+        console.log('Buscando rota da URL:', url);
+        
+        const response = await fetch(url);
         const data = await response.json();
-        if (data.status === 'OK') {
+        console.log('Resposta da API do Google:', JSON.stringify(data, null, 2));
+
+        if (data.status === 'OK' && data.routes && data.routes.length > 0) {
           const leg = data.routes[0].legs[0];
+          console.log('Dados da Rota (leg):', JSON.stringify(leg, null, 2));
+
           setRouteInfo({
             distance: leg.distance.text,
             duration: leg.duration.text
           });
           setRouteCoords(decodePolyline(data.routes[0].overview_polyline.points));
+          
+          const distanciaEmMetros = leg.distance.value;
+          console.log('Distância em metros:', distanciaEmMetros);
+
+          if (distanciaEmMetros > 0) {
+            const distanciaKm = distanciaEmMetros / 1000;
+            const resultado = calcularValorEntrega(distanciaKm);
+            console.log('Resultado do cálculo:', JSON.stringify(resultado, null, 2));
+            setValorEntrega(resultado.valor_total);
+          } else {
+            console.log('Distância não é maior que zero.');
+            setValorEntrega(null);
+          }
         } else {
+          console.log('Erro na resposta da API:', data.status, data.error_message);
           setRouteInfo(null);
           setRouteCoords([]);
+          setValorEntrega(null);
         }
       } catch (e) {
+        console.error('Erro ao buscar rota:', e);
         setRouteInfo(null);
         setRouteCoords([]);
+        setValorEntrega(null);
       } finally {
         setLoading(false);
       }
@@ -143,7 +175,13 @@ const BuscaOpcoesCard = () => {
           <Text style={styles.label}>Destino:</Text>
           <Text style={styles.value}>{destination?.description || 'Não selecionado'}</Text>
           <Text style={styles.label}>Valor:</Text>
-          <Text style={styles.value}>{valorSimulado}</Text>
+          <Text style={styles.value}>
+            {loading
+              ? 'Calculando...'
+              : valorEntrega !== null
+                ? `R$ ${valorEntrega.toFixed(2)}`
+                : 'Calcule a rota'}
+          </Text>
           {loading ? (
             <ActivityIndicator color="#00b5f8" style={{marginTop: 10}} />
           ) : routeInfo && (

@@ -68,7 +68,7 @@ const ProfileScreen = () => {
             const data = await response.json();
             if (response.ok && data.success) {
                 Alert.alert('Sucesso', 'Dados atualizados com sucesso!');
-                setPassword(''); // Limpa o campo senha após sucesso
+                setPassword(''); 
             } else {
                 Alert.alert('Erro', data.message || 'Erro ao atualizar perfil');
             }
