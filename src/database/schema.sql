@@ -178,3 +178,4 @@ INSERT INTO configuracoes_sistema (chave, valor, descricao) VALUES
 ('raio_busca_km', '10', 'Raio de busca para motoboys (km)'),
 ('tempo_maximo_espera', '300', 'Tempo máximo de espera para aceite (segundos)');
 
+

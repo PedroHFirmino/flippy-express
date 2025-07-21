@@ -6,6 +6,7 @@ import { selectOrigin, selectDestination } from '../slices/navSlice';
 import { GOOGLE_MAPS_API_KEY } from '@env';
 import { useNavigation } from '@react-navigation/native';
 import { calcularValorEntrega } from '../src/utils/priceCalculator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -108,13 +109,36 @@ const BuscaOpcoesCard = () => {
     return points;
   }
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!itemDescription.trim()) {
       setError('A descrição do item é obrigatória.');
       return;
     }
     setError('');
-    navigation.navigate('PagamentoPix');
+
+    let user_id = navigation.getState().routes[navigation.getState().routes.length - 1].params?.pedidoData?.user_id;
+    if (!user_id) {
+      user_id = await AsyncStorage.getItem('userId');
+    }
+
+    if (!user_id) {
+      Alert.alert('Erro', 'Não foi possível identificar o usuário. Por favor, faça login novamente.');
+      return;
+    }
+
+    navigation.navigate('PagamentoPix', {
+      pedidoData: {
+        user_id: user_id,
+        origem_latitude: origin.location.lat || origin.location.latitude,
+        origem_longitude: origin.location.lng || origin.location.longitude,
+        origem_endereco: origin.description,
+        destino_latitude: destination.location.lat || destination.location.latitude,
+        destino_longitude: destination.location.lng || destination.location.longitude,
+        destino_endereco: destination.description,
+        descricao_item: itemDescription,
+      
+      }
+    });
   };
 
   // Região inicial do mapa

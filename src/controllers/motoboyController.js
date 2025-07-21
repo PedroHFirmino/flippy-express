@@ -714,6 +714,23 @@ const motoboyController = {
                 message: 'Erro interno do servidor'
             });
         }
+    },
+
+    async setStatus(req, res) {
+        try {
+            const { id } = req.params;
+            const { status } = req.body;
+            const pool = getConnection();
+
+            if (!['online', 'offline'].includes(status)) {
+                return res.status(400).json({ success: false, message: 'Status inválido' });
+            }
+
+            await pool.execute('UPDATE motoboys SET status = ? WHERE id = ?', [status, id]);
+            res.json({ success: true, message: `Status atualizado para ${status}` });
+        } catch (error) {
+            res.status(500).json({ success: false, message: 'Erro ao atualizar status' });
+        }
     }
 };
 

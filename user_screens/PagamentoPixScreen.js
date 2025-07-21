@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Clipboard, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Clipboard, Alert, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CHAVE_PIX = 'flippy-pagamentos@banco.com'; 
 const TEMPO_TOTAL = 5 * 60; 
 
-const PagamentoPixScreen = ({ navigation }) => {
+const API_URL = Platform.OS === 'android'
+  ? 'http://192.168.237.64:3000/api'
+  : 'http://localhost:3000/api';
+
+const PagamentoPixScreen = ({ navigation, route }) => {
   const [tempoRestante, setTempoRestante] = useState(TEMPO_TOTAL);
   const [pagamentoConfirmado, setPagamentoConfirmado] = useState(false);
   const [expirado, setExpirado] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Dados do pedido vindos da tela anterior
+  const pedidoData = route?.params?.pedidoData;
 
   useEffect(() => {
     if (tempoRestante <= 0) {
@@ -32,11 +41,54 @@ const PagamentoPixScreen = ({ navigation }) => {
     Alert.alert('Chave Pix copiada!');
   };
 
-  const confirmarPagamento = () => {
-    setPagamentoConfirmado(true);
-    setTimeout(() => {
-      navigation.goBack(); 
-    }, 2000);
+  const confirmarPagamento = async () => {
+    if (!pedidoData) {
+      Alert.alert('Erro', 'Dados do pedido não encontrados.');
+      return;
+    }
+    setLoading(true);
+    try {
+      
+      let user_id = pedidoData.user_id;
+      if (!user_id) {
+        user_id = await AsyncStorage.getItem('userId');
+      }
+      if (!user_id) {
+        Alert.alert('Erro', 'Usuário não autenticado.');
+        setLoading(false);
+        return;
+      }
+
+      const payload = {
+        user_id: Number(user_id),
+        origem_latitude: pedidoData.origem_latitude,
+        origem_longitude: pedidoData.origem_longitude,
+        origem_endereco: pedidoData.origem_endereco,
+        destino_latitude: pedidoData.destino_latitude,
+        destino_longitude: pedidoData.destino_longitude,
+        destino_endereco: pedidoData.destino_endereco,
+        descricao_item: pedidoData.descricao_item,
+        observacoes: pedidoData.observacoes || null
+      };
+      const response = await fetch(`${API_URL}/pedidos/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      if (data.success) {
+        setPagamentoConfirmado(true);
+        setTimeout(() => {
+          navigation.replace('AguardandoMotoboy');
+        }, 1500);
+      } else {
+        Alert.alert('Erro', data.message || 'Erro ao registrar pedido.');
+      }
+    } catch (e) {
+      Alert.alert('Erro', 'Erro de conexão ao registrar pedido.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,8 +107,8 @@ const PagamentoPixScreen = ({ navigation }) => {
       ) : pagamentoConfirmado ? (
         <Text style={styles.sucesso}>Pedido enviado! Obrigado pelo pagamento.</Text>
       ) : (
-        <TouchableOpacity style={styles.botao} onPress={confirmarPagamento}>
-          <Text style={styles.textoBotao}>Já fiz o Pix</Text>
+        <TouchableOpacity style={styles.botao} onPress={confirmarPagamento} disabled={loading}>
+          <Text style={styles.textoBotao}>{loading ? 'Enviando pedido...' : 'Já fiz o Pix'}</Text>
         </TouchableOpacity>
       )}
     </View>

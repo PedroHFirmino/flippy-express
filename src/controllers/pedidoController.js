@@ -445,6 +445,49 @@ const pedidoController = {
                 message: 'Erro interno do servidor'
             });
         }
+    },
+
+    async getPedidosPendentes(req, res) {
+        try {
+            const pool = getConnection();
+            const [pedidos] = await pool.execute(
+                'SELECT * FROM pedidos WHERE status = "pendente"'
+            );
+            console.log('Pedidos pendentes:', pedidos);
+            res.json({ success: true, data: pedidos });
+        } catch (error) {
+            res.status(500).json({ success: false, message: 'Erro ao buscar pedidos pendentes' });
+        }
+    },
+
+    async aceitarPedido(req, res) {
+        try {
+            const { pedidoId } = req.params;
+            const { motoboy_id } = req.body;
+            const pool = getConnection();
+
+            // Verifica se o pedido ainda está pendente
+            const [pedidos] = await pool.execute(
+                'SELECT status FROM pedidos WHERE id = ?',
+                [pedidoId]
+            );
+            if (pedidos.length === 0) {
+                return res.status(404).json({ success: false, message: 'Pedido não encontrado' });
+            }
+            if (pedidos[0].status !== 'pendente') {
+                return res.status(400).json({ success: false, message: 'Pedido já foi aceito por outro motoboy' });
+            }
+
+            // Atualiza o pedido para aceito e vincula o motoboy
+            await pool.execute(
+                'UPDATE pedidos SET status = ?, motoboy_id = ? WHERE id = ?',
+                ['aceito', motoboy_id, pedidoId]
+            );
+
+            res.json({ success: true, message: 'Pedido aceito com sucesso' });
+        } catch (error) {
+            res.status(500).json({ success: false, message: 'Erro ao aceitar pedido' });
+        }
     }
 };
 

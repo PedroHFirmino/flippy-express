@@ -1,12 +1,148 @@
-import React from 'react';
-import { StyleSheet, View, SafeAreaView, Image, TouchableOpacity, Text, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, SafeAreaView, Image, TouchableOpacity, Text, Alert, FlatList, Platform } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
 import RankingScreen from '../motoboy_components/RankingScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_URL = Platform.OS === 'android'
+  ? 'http://192.168.237.64:3000/api'
+  : 'http://localhost:3000/api';
 
 const MotoboyHomeScreen = () => {
     const navigation = useNavigation();
+    const [online, setOnline] = useState(false);
+    const [loadingStatus, setLoadingStatus] = useState(false);
+    const [pedidos, setPedidos] = useState([]);
+    const [loadingPedidos, setLoadingPedidos] = useState(false);
+    const [motoboyId, setMotoboyId] = useState(null);
+
+    useEffect(() => {
+        // Recuperar ID do motoboy do token (simples, pode ser melhorado)
+        const getMotoboyId = async () => {
+            const token = await AsyncStorage.getItem('motoboyToken');
+            if (!token) return;
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                setMotoboyId(payload.id);
+            } catch (e) {}
+        };
+        getMotoboyId();
+    }, []);
+
+    useEffect(() => {
+        let interval;
+        if (online) {
+            fetchPedidosPendentes();
+            interval = setInterval(fetchPedidosPendentes, 10000); // 10 segundos
+        } else {
+            setPedidos([]);
+        }
+        return () => interval && clearInterval(interval);
+    }, [online]);
+
+    const fetchPedidosPendentes = async () => {
+        setLoadingPedidos(true);
+        try {
+            const response = await fetch(`${API_URL}/pedidos/pendentes`);
+            const data = await response.json();
+            if (data.success) {
+                setPedidos(data.data);
+                console.log('Pedidos pendentes:', data.data);
+            } else {
+                setPedidos([]);
+            }
+        } catch (e) {
+            setPedidos([]);
+        } finally {
+            setLoadingPedidos(false);
+        }
+    };
+
+    const handleToggleStatus = async () => {
+        let id = motoboyId;
+        if (!id) {
+            const token = await AsyncStorage.getItem('motoboyToken');
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    id = payload.id;
+                    setMotoboyId(id);
+                } catch (e) {
+                    Alert.alert('Erro', 'Não foi possível identificar o motoboy. Faça login novamente.');
+                    return;
+                }
+            }
+        }
+        if (!id) {
+            Alert.alert('Erro', 'ID do motoboy não encontrado. Faça login novamente.');
+            return;
+        }
+        setLoadingStatus(true);
+        try {
+            const novoStatus = online ? 'offline' : 'online';
+            console.log('Enviando PATCH para status:', novoStatus, 'motoboyId:', id);
+            const response = await fetch(`${API_URL}/motoboys/${id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: novoStatus })
+            });
+            const data = await response.json();
+            console.log('Resposta do backend ao atualizar status:', data);
+            if (data.success) {
+                setOnline(!online);
+            } else {
+                Alert.alert('Erro', data.message || 'Erro ao atualizar status');
+            }
+        } catch (e) {
+            Alert.alert('Erro', 'Erro de conexão ao atualizar status');
+        } finally {
+            setLoadingStatus(false);
+        }
+    };
+
+    const handleAceitarPedido = async (pedidoId) => {
+        if (!motoboyId) {
+            Alert.alert('Erro', 'ID do motoboy não encontrado. Faça login novamente.');
+            return;
+        }
+        try {
+            const response = await fetch(`${API_URL}/pedidos/${pedidoId}/aceitar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ motoboy_id: motoboyId })
+            });
+            const data = await response.json();
+            if (data.success) {
+                Alert.alert('Sucesso', 'Pedido aceito com sucesso!');
+                // Remove o pedido aceito da lista
+                setPedidos(pedidos.filter(p => p.id !== pedidoId));
+            } else {
+                Alert.alert('Erro', data.message || 'Erro ao aceitar pedido');
+                // Atualiza lista para remover pedidos que não estão mais pendentes
+                fetchPedidosPendentes();
+            }
+        } catch (e) {
+            Alert.alert('Erro', 'Erro de conexão ao aceitar pedido');
+        }
+    };
+
+    const renderPedido = ({ item }) => (
+        <View style={styles.pedidoBox}>
+            <Text style={styles.pedidoTitle}>Pedido #{item.id}</Text>
+            <Text>Origem: {item.origem_endereco}</Text>
+            <Text>Destino: {item.destino_endereco}</Text>
+            <Text>Valor: R$ {item.valor?.toFixed(2)}</Text>
+            <Text>Status: {item.status}</Text>
+            <TouchableOpacity
+                style={styles.aceitarButton}
+                onPress={() => handleAceitarPedido(item.id)}
+            >
+                <Text style={styles.aceitarButtonText}>Aceitar</Text>
+            </TouchableOpacity>
+        </View>
+    );
 
     return (
         <SafeAreaView style={tw`bg-white h-full`}>
@@ -26,12 +162,23 @@ const MotoboyHomeScreen = () => {
                         <Icon
                             name="circle"
                             type="font-awesome"
-                            color="#4CAF50"
+                            color={online ? "#4CAF50" : "#F44336"}
                             size={12}
                         />
-                        <Text style={styles.statusText}>Online</Text>
+                        <Text style={styles.statusText}>{online ? 'Online' : 'Offline'}</Text>
                     </View>
+                    <TouchableOpacity
+                        style={[styles.startButton, { backgroundColor: online ? '#F44336' : '#00b5f8' }]}
+                        onPress={handleToggleStatus}
+                        disabled={loadingStatus}
+                    >
+                        <Text style={styles.startButtonText}>
+                            {loadingStatus ? 'Aguarde...' : online ? 'Encerrar Trabalho' : 'Iniciar Trabalho'}
+                        </Text>
+                    </TouchableOpacity>
                 </View>
+
+                {/* Removido: exibição das solicitações pendentes aqui */}
 
                 <View style={styles.statsContainer}>
                     <View style={styles.statItem}>
@@ -45,9 +192,17 @@ const MotoboyHomeScreen = () => {
                 </View>
 
                 <TouchableOpacity
-                    style={styles.startButton}
-                    onPress={() => navigation.navigate('MotoboyMap')}>
-                    <Text style={styles.startButtonText}>Iniciar Trabalho</Text>
+                    style={[styles.startButton, { opacity: online ? 1 : 0.5 }]}
+                    onPress={() => {
+                        if (online) {
+                            navigation.navigate('MotoboyMap');
+                        } else {
+                            Alert.alert('Atenção', 'Você precisa estar online para ver entregas.');
+                        }
+                    }}
+                    disabled={!online}
+                >
+                    <Text style={styles.startButtonText}>Ir ao Mapa</Text>
                 </TouchableOpacity>
 
                 {/* Campanha da semana */}
@@ -210,6 +365,42 @@ const styles = StyleSheet.create({
     campanhaDescricao: {
         fontSize: 15,
         color: '#333',
+    },
+    pedidosContainer: {
+        marginTop: 20,
+        backgroundColor: '#f8f9fa',
+        borderRadius: 10,
+        padding: 15,
+    },
+    pedidosTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: '#00b5f8',
+    },
+    pedidoBox: {
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        padding: 10,
+        marginBottom: 10,
+        elevation: 2,
+    },
+    pedidoTitle: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        marginBottom: 4,
+    },
+    aceitarButton: {
+        backgroundColor: '#4CAF50',
+        padding: 10,
+        borderRadius: 8,
+        marginTop: 10,
+        alignItems: 'center',
+    },
+    aceitarButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
     },
 });
 

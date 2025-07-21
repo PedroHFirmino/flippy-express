@@ -23,6 +23,7 @@ import RankingScreen from './motoboy_components/RankingScreen';
 import ConfigScreen from './mototboy_screens/ConfigScreen';
 import SolicitarSaqueScreen from './mototboy_screens/SolicitarSaqueScreen';
 import PagamentoPixScreen from './user_screens/PagamentoPixScreen';
+import AguardandoMotoboyScreen from './user_screens/AguardandoMotoboyScreen';
 
 
 
@@ -160,6 +161,11 @@ export default function App() {
             options={{
               headerShown: false,
             }}
+          />
+          <Stack.Screen
+            name="AguardandoMotoboy"
+            component={AguardandoMotoboyScreen}
+            options={{ headerShown: false }}
           />
 
 

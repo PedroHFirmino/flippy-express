@@ -37,6 +37,9 @@ export default function SignInUser () {
             const data = await response.json();
             if (response.ok && data.success) {
                 await AsyncStorage.setItem('userToken', data.data.token);
+                if (data.data.user && data.data.user.id) {
+                    await AsyncStorage.setItem('userId', String(data.data.user.id));
+                }
                 Alert.alert(
                     'Sucesso!',
                     'Login realizado com sucesso!',

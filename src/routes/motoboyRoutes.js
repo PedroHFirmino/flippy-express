@@ -20,5 +20,6 @@ router.post('/solicitar-saque', verifyToken, verifyMotoboy, motoboyController.so
 router.put('/stats', motoboyController.updateStats);
 router.post('/delivery-history', motoboyController.insertDeliveryHistory);
 router.put('/update-all-stats', motoboyController.updateAllStats);
+router.patch('/:id/status', motoboyController.setStatus);
 
 module.exports = router;
