@@ -24,6 +24,7 @@ import ConfigScreen from './mototboy_screens/ConfigScreen';
 import SolicitarSaqueScreen from './mototboy_screens/SolicitarSaqueScreen';
 import PagamentoPixScreen from './user_screens/PagamentoPixScreen';
 import AguardandoMotoboyScreen from './user_screens/AguardandoMotoboyScreen';
+import EntregaEmAndamentoScreen from './mototboy_screens/EntregaEmAndamentoScreen';
 
 
 
@@ -165,6 +166,11 @@ export default function App() {
           <Stack.Screen
             name="AguardandoMotoboy"
             component={AguardandoMotoboyScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="EntregaEmAndamento"
+            component={EntregaEmAndamentoScreen}
             options={{ headerShown: false }}
           />
 

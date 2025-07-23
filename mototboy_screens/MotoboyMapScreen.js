@@ -356,12 +356,12 @@ const MotoboyMapScreen = () => {
                 >
                   <Text style={styles.aceitarButtonText}>Aceitar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+        <TouchableOpacity
                   style={[styles.recusarButton, { flex: 1, marginLeft: 8 }]}
                   onPress={() => setPedidos(pedidos.slice(1))}
-                >
+        >
                   <Text style={styles.recusarButtonText}>Recusar</Text>
-                </TouchableOpacity>
+        </TouchableOpacity>
               </View>
             </View>
           </ScrollView>
@@ -557,38 +557,49 @@ const styles = StyleSheet.create({
   },
   pedidoInfoBox: {
     width: '100%',
+    backgroundColor: '#f4f8fb',
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 10,
+    shadowColor: '#00b5f8',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
     alignItems: 'flex-start',
   },
   pedidoLabel: {
     fontWeight: 'bold',
-    color: '#333',
-    marginTop: 6,
+    color: '#0077b6',
+    marginTop: 10,
+    fontSize: 16,
   },
   pedidoValue: {
-    color: '#444',
+    color: '#333',
     fontSize: 16,
     marginBottom: 2,
+    marginLeft: 8,
   },
   pedidoButtonRow: {
     flexDirection: 'row',
-    marginTop: 16,
+    marginTop: 24,
     width: '100%',
   },
   recusarButton: {
     backgroundColor: '#F44336',
-    padding: 10,
-    borderRadius: 8,
+    padding: 14,
+    borderRadius: 10,
     alignItems: 'center',
   },
   recusarButtonText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
   novoPedidoBox: {
     borderWidth: 2,
     borderColor: '#00b5f8',
-    backgroundColor: '#e0f7fa',
+    backgroundColor: '#e6f7ff',
   },
 });
 
