@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Alert, Platform, KeyboardAvoidingView } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 import { ScrollView } from 'react-native';
@@ -122,132 +122,138 @@ export default function SignUpMotoB() {
 
 
   return (
-    <View style={styles.container}>
-      <Animatable.View animation="fadeInLeft" delay={500} style={styles.containerHeader}>
-        <Text style={styles.message}>Cadastre-se</Text>
-      </Animatable.View>
-
-      <ScrollView style={{flex:1}}
-                  contentContainerStyle={{ paddingBottom: 50 }}>
-        <Animatable.View animation="fadeInUp" style={styles.containerForm}>
-          <Text style={styles.title}>Nome Completo</Text>
-          <TextInput 
-            placeholder="Digite seu nome"
-            style={styles.input}
-            value={nome}
-            onChangeText={setNome}
-          />
-
-          <Text style={styles.title}>Sexo</Text>
-          <Picker
-            selectedValue={selectedGender}
-            onValueChange={(itemValue) => setSelectedGender(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Selecione o sexo" value="" />
-            <Picker.Item label="Masculino" value="masculino" />
-            <Picker.Item label="Feminino" value="feminino" />
-            <Picker.Item label="Outro" value="outro" />
-          </Picker>
-
-          <Text style={styles.title}>CPF</Text>
-          <TextInput 
-            placeholder="Digite seu CPF"
-            style={styles.input}
-            value={cpf}
-            onChangeText={setCpf}
-          />
-
-          <Text style={styles.title}>Telefone</Text>
-          <TextInput 
-            placeholder="Digite seu telefone"
-            style={styles.input}
-            value={telefone}
-            onChangeText={setTelefone}
-            keyboardType="phone-pad"
-          />
-
-          <Text style={styles.title}>Data de Nascimento</Text>
-          <TextInput 
-            placeholder="DD-MM-AA"
-            style={styles.input}
-            value={nascimento}
-            onChangeText={setNascimento}
-          />
-
-          <Text style={styles.title}>Endereço</Text>
-          <TextInput 
-            placeholder="Digite seu endereço - nº"
-            style={styles.input}
-            value={endereco}
-            onChangeText={setEndereco}
-          />
-
-          <Text style={styles.title}>CEP</Text>
-          <TextInput 
-            placeholder="Digite seu CEP"
-            style={styles.input}
-            value={cep}
-            onChangeText={setCep}
-            keyboardType="numeric"
-          />
-
-          <Text style={styles.title}>Cidade</Text>
-          <TextInput 
-            placeholder="Digite sua cidade"
-            style={styles.input}
-            value={cidade}
-            onChangeText={setCidade}
-          />
-
-          <Text style={styles.title}>Estado</Text>
-          <TextInput 
-            placeholder="Digite seu estado"
-            style={styles.input}
-            value={estado}
-            onChangeText={setEstado}
-          />        
-
-          <Text style={styles.title}>E-mail</Text>
-          <TextInput 
-            placeholder="Digite seu E-mail"
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-
-          <Text style={styles.title}>Senha</Text>
-          <TextInput 
-            placeholder="Digite uma senha"
-            style={styles.input}
-            value={senha}
-            onChangeText={setSenha}
-            secureTextEntry
-          />
-
-          <Text style={styles.title}>Confirme sua senha</Text>
-          <TextInput 
-            placeholder="Confirme sua senha"
-            style={styles.input}
-            value={confirmSenha}
-            onChangeText={setConfirmSenha}
-            secureTextEntry
-          />
-
-          <TouchableOpacity 
-            onPress={handleCadastro}
-            style={[styles.button, loading && styles.buttonDisabled]}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? 'Cadastrando...' : 'Cadastrar'}
-            </Text>
-          </TouchableOpacity>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+    >
+      <View style={styles.container}>
+        <Animatable.View animation="fadeInLeft" delay={500} style={styles.containerHeader}>
+          <Text style={styles.message}>Cadastro Motoboy</Text>
         </Animatable.View>
-      </ScrollView>
-    </View>
+
+        <ScrollView style={{flex:1}}
+                    contentContainerStyle={{ paddingBottom: 50 }}>
+          <Animatable.View animation="fadeInUp" style={styles.containerForm}>
+            <Text style={styles.title}>Nome Completo</Text>
+            <TextInput 
+              placeholder="Digite seu nome"
+              style={styles.input}
+              value={nome}
+              onChangeText={setNome}
+            />
+
+            <Text style={styles.title}>Sexo</Text>
+            <Picker
+              selectedValue={selectedGender}
+              onValueChange={(itemValue) => setSelectedGender(itemValue)}
+              style={styles.picker}
+            >
+              <Picker.Item label="Selecione o sexo" value="" />
+              <Picker.Item label="Masculino" value="masculino" />
+              <Picker.Item label="Feminino" value="feminino" />
+              <Picker.Item label="Outro" value="outro" />
+            </Picker>
+
+            <Text style={styles.title}>CPF</Text>
+            <TextInput 
+              placeholder="Digite seu CPF"
+              style={styles.input}
+              value={cpf}
+              onChangeText={setCpf}
+            />
+
+            <Text style={styles.title}>Telefone</Text>
+            <TextInput 
+              placeholder="Digite seu telefone"
+              style={styles.input}
+              value={telefone}
+              onChangeText={setTelefone}
+              keyboardType="phone-pad"
+            />
+
+            <Text style={styles.title}>Data de Nascimento</Text>
+            <TextInput 
+              placeholder="DD-MM-AA"
+              style={styles.input}
+              value={nascimento}
+              onChangeText={setNascimento}
+            />
+
+            <Text style={styles.title}>Endereço</Text>
+            <TextInput 
+              placeholder="Digite seu endereço - nº"
+              style={styles.input}
+              value={endereco}
+              onChangeText={setEndereco}
+            />
+
+            <Text style={styles.title}>CEP</Text>
+            <TextInput 
+              placeholder="Digite seu CEP"
+              style={styles.input}
+              value={cep}
+              onChangeText={setCep}
+              keyboardType="numeric"
+            />
+
+            <Text style={styles.title}>Cidade</Text>
+            <TextInput 
+              placeholder="Digite sua cidade"
+              style={styles.input}
+              value={cidade}
+              onChangeText={setCidade}
+            />
+
+            <Text style={styles.title}>Estado</Text>
+            <TextInput 
+              placeholder="Digite seu estado"
+              style={styles.input}
+              value={estado}
+              onChangeText={setEstado}
+            />        
+
+            <Text style={styles.title}>E-mail</Text>
+            <TextInput 
+              placeholder="Digite seu E-mail"
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            <Text style={styles.title}>Senha</Text>
+            <TextInput 
+              placeholder="Digite uma senha"
+              style={styles.input}
+              value={senha}
+              onChangeText={setSenha}
+              secureTextEntry
+            />
+
+            <Text style={styles.title}>Confirme sua senha</Text>
+            <TextInput 
+              placeholder="Confirme sua senha"
+              style={styles.input}
+              value={confirmSenha}
+              onChangeText={setConfirmSenha}
+              secureTextEntry
+            />
+
+            <TouchableOpacity 
+              onPress={handleCadastro}
+              style={[styles.button, loading && styles.buttonDisabled]}
+              disabled={loading}
+            >
+              <Text style={styles.buttonText}>
+                {loading ? 'Cadastrando...' : 'Cadastrar'}
+              </Text>
+            </TouchableOpacity>
+          </Animatable.View>
+        </ScrollView>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 

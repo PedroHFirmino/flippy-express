@@ -4,6 +4,7 @@ import {View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Platform} fr
 import * as Animatable from 'react-native-animatable';
 import {useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Icon } from 'react-native-elements';
 
 
 const API_URL = Platform.OS === 'android' 
@@ -15,6 +16,7 @@ export default function SignInMotoB () {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -101,13 +103,24 @@ export default function SignInMotoB () {
                 />
 
                 <Text style={styles.title}>Senha</Text>
-                <TextInput 
-                    placeholder="Senha"
-                    style={styles.input}
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                />
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <TextInput 
+                        placeholder="Senha"
+                        style={[styles.input, { flex: 1 }]}
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry={!showPassword}
+                    />
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                        <Icon
+                            name={showPassword ? 'eye' : 'eye-slash'}
+                            type="font-awesome"
+                            color="#00b5f8"
+                            size={22}
+                            style={{ marginLeft: 8 }}
+                        />
+                    </TouchableOpacity>
+                </View>
 
                 <TouchableOpacity 
                     style={[styles.button, loading && styles.buttonDisabled]}
