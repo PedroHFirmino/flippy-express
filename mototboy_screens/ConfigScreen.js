@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Image, ScrollView, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Image, ScrollView, ActivityIndicator, Platform, KeyboardAvoidingView } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
@@ -160,73 +160,79 @@ const ConfigScreen = () => {
     }
 
     return (
-        <SafeAreaView style={tw`bg-white h-full`}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Icon name="arrow-back" type="material" color="black" size={24} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Configurações</Text>
-            </View>
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={styles.profileContainer}>
-                    <Image
-                        source={require('../assets/usuario.png')}
-                        style={styles.profileImage}
-                    />
-                    <Text style={styles.profileName}>{name || 'Carregando...'}</Text>
-                </View>
-                <View style={styles.formContainer}>
-                    <Text style={styles.label}>Nome</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Digite seu nome"
-                        value={name}
-                        onChangeText={setName}
-                        editable={!loading}
-                    />
-                    <Text style={styles.label}>E-mail</Text>
-                    <TextInput
-                        style={[styles.input, styles.disabledInput]}
-                        placeholder="Digite seu e-mail"
-                        value={email}
-                        editable={false}
-                    />
-                    <Text style={styles.disabledText}>E-mail não pode ser alterado</Text>
-                    <Text style={styles.label}>Telefone</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Digite seu telefone"
-                        value={phone}
-                        onChangeText={setPhone}
-                        keyboardType="phone-pad"
-                        editable={!loading}
-                    />
-                    <Text style={styles.label}>Nova Senha (opcional)</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Digite sua nova senha"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
-                        editable={!loading}
-                    />
-                    <Text style={styles.optionalText}>Deixe em branco para manter a senha atual</Text>
-                    
-                    <TouchableOpacity 
-                        style={[styles.saveButton, loading && styles.saveButtonDisabled]} 
-                        onPress={handleSave}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <ActivityIndicator size="small" color="white" />
-                        ) : (
-                            <Text style={styles.saveButtonText}>Salvar Alterações</Text>
-                        )}
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+        >
+            <SafeAreaView style={tw`bg-white h-full`}>
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <Icon name="arrow-back" type="material" color="black" size={24} />
                     </TouchableOpacity>
-
+                    <Text style={styles.headerTitle}>Configurações</Text>
                 </View>
-            </ScrollView>
-        </SafeAreaView>
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    <View style={styles.profileContainer}>
+                        <Image
+                            source={require('../assets/usuario.png')}
+                            style={styles.profileImage}
+                        />
+                        <Text style={styles.profileName}>{name || 'Carregando...'}</Text>
+                    </View>
+                    <View style={styles.formContainer}>
+                        <Text style={styles.label}>Nome</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Digite seu nome"
+                            value={name}
+                            onChangeText={setName}
+                            editable={!loading}
+                        />
+                        <Text style={styles.label}>E-mail</Text>
+                        <TextInput
+                            style={[styles.input, styles.disabledInput]}
+                            placeholder="Digite seu e-mail"
+                            value={email}
+                            editable={false}
+                        />
+                        <Text style={styles.disabledText}>E-mail não pode ser alterado</Text>
+                        <Text style={styles.label}>Telefone</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Digite seu telefone"
+                            value={phone}
+                            onChangeText={setPhone}
+                            keyboardType="phone-pad"
+                            editable={!loading}
+                        />
+                        <Text style={styles.label}>Nova Senha (opcional)</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Digite sua nova senha"
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry
+                            editable={!loading}
+                        />
+                        <Text style={styles.optionalText}>Deixe em branco para manter a senha atual</Text>
+                        
+                        <TouchableOpacity 
+                            style={[styles.saveButton, loading && styles.saveButtonDisabled]} 
+                            onPress={handleSave}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <ActivityIndicator size="small" color="white" />
+                            ) : (
+                                <Text style={styles.saveButtonText}>Salvar Alterações</Text>
+                            )}
+                        </TouchableOpacity>
+
+                    </View>
+                </ScrollView>
+            </SafeAreaView>
+        </KeyboardAvoidingView>
     );
 };
 
