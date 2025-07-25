@@ -171,27 +171,27 @@ const pedidoController = {
 
     async updateStatus(req, res) {
         try {
+            console.log('PATCH /pedidos/:id/status', req.params, req.body);
             const { id } = req.params;
             const { status, motoboy_id } = req.body;
             const pool = getConnection();
 
-   
             const validStatuses = ['pendente', 'aceito', 'em_andamento', 'entregue', 'cancelado'];
-            
             if (!validStatuses.includes(status)) {
+                console.log('Status inválido:', status);
                 return res.status(400).json({
                     success: false,
                     message: 'Status inválido'
                 });
             }
 
-    
             const [pedidos] = await pool.execute(
                 'SELECT * FROM pedidos WHERE id = ?',
                 [id]
             );
 
             if (pedidos.length === 0) {
+                console.log('Pedido não encontrado:', id);
                 return res.status(404).json({
                     success: false,
                     message: 'Pedido não encontrado'
@@ -200,7 +200,6 @@ const pedidoController = {
 
             const pedido = pedidos[0];
 
-       
             if (status === 'aceito' && motoboy_id) {
                 const [motoboys] = await pool.execute(
                     'SELECT status FROM motoboys WHERE id = ? AND status = "online"',
@@ -208,20 +207,19 @@ const pedidoController = {
                 );
 
                 if (motoboys.length === 0) {
+                    console.log('Motoboy não encontrado ou não está online:', motoboy_id);
                     return res.status(400).json({
                         success: false,
                         message: 'Motoboy não encontrado ou não está online'
                     });
                 }
 
-             
                 await pool.execute(
                     'UPDATE motoboys SET status = "em_entrega" WHERE id = ?',
                     [motoboy_id]
                 );
             }
 
-       
             if (status === 'entregue' && pedido.motoboy_id) {
                 await pool.execute(
                     'UPDATE motoboys SET status = "online" WHERE id = ?',
@@ -229,7 +227,6 @@ const pedidoController = {
                 );
             }
 
-   
             const updateData = { status };
             if (motoboy_id) {
                 updateData.motoboy_id = motoboy_id;
@@ -283,9 +280,18 @@ const pedidoController = {
                 });
             }
 
+            const pedido = pedidos[0];
+
             res.json({
-                success: true,
-                data: pedidos[0]
+              success: true,
+              data: {
+                ...pedido,
+                origem_latitude: Number(pedido.origem_latitude),
+                origem_longitude: Number(pedido.origem_longitude),
+                destino_latitude: Number(pedido.destino_latitude),
+                destino_longitude: Number(pedido.destino_longitude),
+                // ...outros campos se quiser garantir tipo
+              }
             });
 
         } catch (error) {
@@ -478,10 +484,10 @@ const pedidoController = {
                 return res.status(400).json({ success: false, message: 'Pedido já foi aceito por outro motoboy' });
             }
 
-            // Atualiza o pedido para aceito e vincula o motoboy
+            // Atualiza o pedido para em_andamento e vincula o motoboy
             await pool.execute(
                 'UPDATE pedidos SET status = ?, motoboy_id = ? WHERE id = ?',
-                ['aceito', motoboy_id, pedidoId]
+                ['em_andamento', motoboy_id, pedidoId]
             );
 
             res.json({ success: true, message: 'Pedido aceito com sucesso' });

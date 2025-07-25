@@ -731,6 +731,59 @@ const motoboyController = {
         } catch (error) {
             res.status(500).json({ success: false, message: 'Erro ao atualizar status' });
         }
+    },
+
+    async getStatsDia(req, res) {
+        try {
+            const { id } = req.params;
+            const pool = getConnection();
+            // Entregas e ganhos do dia
+            const [result] = await pool.execute(
+                `SELECT COUNT(*) as entregasHoje, COALESCE(SUM(gm.valor_ganho),0) as ganhosHoje
+                 FROM pedidos p
+                 JOIN ganhos_motoboy gm ON gm.pedido_id = p.id
+                 WHERE p.motoboy_id = ?
+                   AND p.status = 'entregue'
+                   AND DATE(p.data_entrega) = CURDATE()`,
+                [id]
+            );
+            res.json({
+                success: true,
+                data: {
+                    ...result[0],
+                    ganhosHoje: Number(result[0].ganhosHoje)
+                }
+            });
+        } catch (error) {
+            res.status(500).json({ success: false, message: 'Erro ao buscar estatísticas do dia' });
+        }
+    },
+
+    async getPedidoEmAndamento(req, res) {
+        try {
+            const { id } = req.params;
+            const pool = getConnection();
+            const [pedidos] = await pool.execute(
+                'SELECT * FROM pedidos WHERE motoboy_id = ? AND status = "em_andamento" LIMIT 1',
+                [id]
+            );
+            if (pedidos.length === 0) {
+                return res.json({ success: true, data: null });
+            }
+            const pedido = pedidos[0];
+            res.json({
+                success: true,
+                data: {
+                    ...pedido,
+                    origem_latitude: Number(pedido.origem_latitude),
+                    origem_longitude: Number(pedido.origem_longitude),
+                    destino_latitude: Number(pedido.destino_latitude),
+                    destino_longitude: Number(pedido.destino_longitude),
+                }
+            });
+        } catch (error) {
+            res.status(500).json({ success: false, message: 'Erro ao buscar entrega em andamento' });
+        }
     }
 };
 

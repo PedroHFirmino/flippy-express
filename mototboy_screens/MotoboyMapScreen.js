@@ -22,6 +22,7 @@ const MotoboyMapScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const prevPedidosLength = useRef(0);
+  const [navegouEntrega, setNavegouEntrega] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -75,6 +76,22 @@ const MotoboyMapScreen = () => {
     prevPedidosLength.current = pedidos.length;
   }, [pedidos]);
 
+  useEffect(() => {
+    const checkEntregaEmAndamento = async () => {
+      if (!motoboyId || navegouEntrega) return;
+      try {
+        const response = await fetch(`${API_URL}/motoboys/${motoboyId}/em-andamento`);
+        const data = await response.json();
+        if (data.success && data.data) {
+          setNavegouEntrega(true);
+          navigation.navigate('EntregaEmAndamento', { pedido: data.data });
+        }
+      } catch (e) {}
+    };
+    checkEntregaEmAndamento();
+    return () => setNavegouEntrega(false);
+  }, [motoboyId, navegouEntrega]);
+
   const fetchPedidosPendentes = async () => {
     setLoadingPedidos(true);
     try {
@@ -82,7 +99,7 @@ const MotoboyMapScreen = () => {
       const response = await fetch(`${API_URL}/pedidos/pendentes`);
       const data = await response.json();
       if (data.success) {
-        setPedidos(data.data);
+        setPedidos(data.data.filter(p => p.status === 'pendente'));
       } else {
         setPedidos([]);
       }
@@ -107,7 +124,19 @@ const MotoboyMapScreen = () => {
       });
       const data = await response.json();
       if (data.success) {
-        Alert.alert('Sucesso', 'Pedido aceito com sucesso!');
+        // Buscar o pedido aceito do backend
+        const pedidoResp = await fetch(`${API_URL}/pedidos/${pedidoId}`);
+        const pedidoData = await pedidoResp.json();
+        if (
+          pedidoData.success &&
+          pedidoData.data &&
+          pedidoData.data.origem_latitude &&
+          pedidoData.data.destino_latitude
+        ) {
+          navigation.navigate('EntregaEmAndamento', { pedido: pedidoData.data });
+        } else {
+          Alert.alert('Erro', 'Não foi possível carregar os dados completos do pedido.');
+        }
         setPedidos(pedidos.filter(p => p.id !== pedidoId));
       } else {
         Alert.alert('Erro', data.message || 'Erro ao aceitar pedido');

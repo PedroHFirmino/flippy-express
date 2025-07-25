@@ -11,12 +11,17 @@ const EntregaEmAndamentoScreen = ({ route, navigation }) => {
     // Buscar rota entre origem e destino usando Google Directions API
     const fetchRoute = async () => {
       try {
-        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${pedido.origem_latitude},${pedido.origem_longitude}&destination=${pedido.destino_latitude},${pedido.destino_longitude}&key=YOUR_GOOGLE_MAPS_API_KEY&language=pt-BR`;
+        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${pedido.origem_latitude},${pedido.origem_longitude}&destination=${pedido.destino_latitude},${pedido.destino_longitude}&key=AIzaSyBlf3KnNcmJ7YlZeoh2TRucqSjtiyRXgvg&language=pt-BR`;
         const response = await fetch(url);
         const data = await response.json();
+        console.log('Resposta Google Directions:', data);
         if (data.status === 'OK') {
           const points = data.routes[0].overview_polyline.points;
           setRouteCoords(decodePolyline(points));
+        } else {
+          Alert.alert('Erro', 'Não foi possível traçar a rota. Verifique a chave da API ou os dados de origem/destino.');
+          setLoading(false);
+          return;
         }
       } catch (e) {}
       setLoading(false);
@@ -76,6 +81,27 @@ const EntregaEmAndamentoScreen = ({ route, navigation }) => {
       setLoading(false);
     }
   };
+
+  // Proteção contra dados incompletos
+  if (
+    !pedido ||
+    typeof pedido.origem_latitude !== 'number' ||
+    typeof pedido.origem_longitude !== 'number' ||
+    typeof pedido.destino_latitude !== 'number' ||
+    typeof pedido.destino_longitude !== 'number' ||
+    !pedido.origem_endereco ||
+    !pedido.destino_endereco
+  ) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ color: 'red', fontSize: 16, textAlign: 'center' }}>
+          Erro: Dados do pedido incompletos ou inválidos. Não foi possível exibir a entrega.
+        </Text>
+      </View>
+    );
+  }
+
+  console.log('Pedido recebido na tela EntregaEmAndamento:', pedido);
 
   return (
     <View style={styles.container}>

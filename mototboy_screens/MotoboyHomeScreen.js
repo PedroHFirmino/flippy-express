@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, SafeAreaView, Image, TouchableOpacity, Text, Alert, FlatList, Platform } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import tw from 'twrnc';
 import RankingScreen from '../motoboy_components/RankingScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,6 +17,8 @@ const MotoboyHomeScreen = () => {
     const [pedidos, setPedidos] = useState([]);
     const [loadingPedidos, setLoadingPedidos] = useState(false);
     const [motoboyId, setMotoboyId] = useState(null);
+    const [entregasHoje, setEntregasHoje] = useState(0);
+    const [ganhosHoje, setGanhosHoje] = useState(0);
 
     useEffect(() => {
         // Recuperar ID do motoboy do token (simples, pode ser melhorado)
@@ -41,6 +43,28 @@ const MotoboyHomeScreen = () => {
         }
         return () => interval && clearInterval(interval);
     }, [online]);
+
+    // Atualizar stats e ranking ao focar na tela
+    useFocusEffect(
+      React.useCallback(() => {
+        const fetchStats = async () => {
+          if (!motoboyId) return;
+          try {
+            const API_URL = Platform.OS === 'android'
+              ? 'http://192.168.237.64:3000/api'
+              : 'http://localhost:3000/api';
+            const response = await fetch(`${API_URL}/motoboys/${motoboyId}/stats-dia`);
+            const data = await response.json();
+            if (data.success) {
+              setEntregasHoje(data.data.entregasHoje || 0);
+              setGanhosHoje(data.data.ganhosHoje || 0);
+            }
+          } catch (e) {}
+        };
+        fetchStats();
+
+      }, [motoboyId])
+    );
 
     const fetchPedidosPendentes = async () => {
         setLoadingPedidos(true);
@@ -115,12 +139,17 @@ const MotoboyHomeScreen = () => {
             });
             const data = await response.json();
             if (data.success) {
-                Alert.alert('Sucesso', 'Pedido aceito com sucesso!');
-                // Remove o pedido aceito da lista
+                // Buscar o pedido aceito do backend
+                const pedidoResp = await fetch(`${API_URL}/pedidos/${pedidoId}`);
+                const pedidoData = await pedidoResp.json();
+                if (pedidoData.success && pedidoData.data) {
+                    navigation.navigate('EntregaEmAndamento', { pedido: pedidoData.data });
+                } else {
+                    Alert.alert('Erro', 'Não foi possível carregar os dados do pedido.');
+                }
                 setPedidos(pedidos.filter(p => p.id !== pedidoId));
             } else {
                 Alert.alert('Erro', data.message || 'Erro ao aceitar pedido');
-                // Atualiza lista para remover pedidos que não estão mais pendentes
                 fetchPedidosPendentes();
             }
         } catch (e) {
@@ -182,11 +211,13 @@ const MotoboyHomeScreen = () => {
 
                 <View style={styles.statsContainer}>
                     <View style={styles.statItem}>
-                        <Text style={styles.statValue}>0</Text>
+                        <Text style={styles.statValue}>{entregasHoje}</Text>
                         <Text style={styles.statLabel}>Entregas Hoje</Text>
                     </View>
                     <View style={styles.statItem}>
-                        <Text style={styles.statValue}>R$ 0,00</Text>
+                        <Text style={styles.statValue}>
+                            R$ {typeof ganhosHoje === 'number' ? ganhosHoje.toFixed(2) : (Number(ganhosHoje) ? Number(ganhosHoje).toFixed(2) : '0,00')}
+                        </Text>
                         <Text style={styles.statLabel}>Ganhos Hoje</Text>
                     </View>
                 </View>
