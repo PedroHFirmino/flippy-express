@@ -38,6 +38,10 @@ export default function SignInUser () {
             });
             const data = await response.json();
             if (response.ok && data.success) {
+                // Limpar tokens de motoboy para evitar conflitos
+                await AsyncStorage.removeItem('motoboyToken');
+                await AsyncStorage.removeItem('motoboyId');
+                
                 await AsyncStorage.setItem('userToken', data.data.token);
                 if (data.data.user && data.data.user.id) {
                     await AsyncStorage.setItem('userId', String(data.data.user.id));

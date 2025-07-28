@@ -1,7 +1,29 @@
-import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Platform, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_URL = Platform.OS === 'android'
+  ? 'http://192.168.237.64:3000/api'
+  : 'http://localhost:3000/api';
 
 const AguardandoMotoboyScreen = ({ navigation }) => {
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    getUserId();
+  }, []);
+
+    const getUserId = async () => {
+    try {
+      const id = await AsyncStorage.getItem('userId');
+      setUserId(id);
+    } catch (error) {
+      console.error('Erro ao obter userId:', error);
+    }
+  };
+
+
+
   return (
     <View style={styles.container}>
       <View style={styles.box}>

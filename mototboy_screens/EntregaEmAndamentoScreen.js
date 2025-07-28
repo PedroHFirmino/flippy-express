@@ -6,8 +6,27 @@ const EntregaEmAndamentoScreen = ({ route, navigation }) => {
   const { pedido } = route.params;
   const [routeCoords, setRouteCoords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [entregaFinalizada, setEntregaFinalizada] = useState(false);
 
   useEffect(() => {
+    // Verificar se a entrega já foi finalizada
+    if (pedido.status === 'entregue') {
+      setEntregaFinalizada(true);
+      setTimeout(() => {
+        Alert.alert(
+          'Entrega Já Finalizada',
+          'Esta entrega já foi finalizada anteriormente.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('MotoboyHome')
+            }
+          ]
+        );
+      }, 1000);
+      return;
+    }
+    
     // Buscar rota entre origem e destino usando Google Directions API
     const fetchRoute = async () => {
       try {
@@ -138,9 +157,21 @@ const EntregaEmAndamentoScreen = ({ route, navigation }) => {
         <Text style={styles.value}>{pedido.destino_endereco}</Text>
         <Text style={styles.label}>Valor:</Text>
         <Text style={styles.value}>R$ {typeof pedido.valor === 'number' ? pedido.valor.toFixed(2) : (Number(pedido.valor) ? Number(pedido.valor).toFixed(2) : '---')}</Text>
-        <TouchableOpacity style={styles.botao} onPress={finalizarEntrega} disabled={loading}>
-          <Text style={styles.textoBotao}>{loading ? 'Finalizando...' : 'Finalizar Entrega'}</Text>
-        </TouchableOpacity>
+        {entregaFinalizada ? (
+          <View style={styles.entregaFinalizadaContainer}>
+            <Text style={styles.entregaFinalizadaText}> Entrega Finalizada</Text>
+            <TouchableOpacity 
+              style={styles.voltarButton} 
+              onPress={() => navigation.navigate('MotoboyHome')}
+            >
+              <Text style={styles.voltarButtonText}>Voltar para Home</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity style={styles.botao} onPress={finalizarEntrega} disabled={loading}>
+            <Text style={styles.textoBotao}>{loading ? 'Finalizando...' : 'Finalizar Entrega'}</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -204,6 +235,27 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 18,
+  },
+  entregaFinalizadaContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  entregaFinalizadaText: {
+    color: '#34C759',
+    fontWeight: 'bold',
+    fontSize: 18,
+    marginBottom: 15,
+  },
+  voltarButton: {
+    backgroundColor: '#007AFF',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  voltarButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
 

@@ -26,9 +26,6 @@ import PagamentoPixScreen from './user_screens/PagamentoPixScreen';
 import AguardandoMotoboyScreen from './user_screens/AguardandoMotoboyScreen';
 import EntregaEmAndamentoScreen from './mototboy_screens/EntregaEmAndamentoScreen';
 
-
-
-
 export default function App() {
   const Stack = createNativeStackNavigator();
 

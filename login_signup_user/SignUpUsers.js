@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert, Platform, KeyboardAvoidingView } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
+import { TextInputMask } from 'react-native-masked-text';
 
 
 const API_URL = Platform.OS === 'android' 
@@ -39,6 +40,11 @@ export default function SignUpUsers() {
 
     if (senha.length < 6) {
       Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres!');
+      return;
+    }
+
+    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+      Alert.alert('Erro', 'E-mail inválido');
       return;
     }
 
@@ -143,12 +149,13 @@ export default function SignUpUsers() {
           />
 
           <Text style={styles.title}>Telefone</Text>
-          <TextInput 
-            placeholder="Digite seu telefone"
+          <TextInputMask
+            type={'cel-phone'}
+            options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
+            placeholder="(99) 99999-9999"
             style={styles.input}
             value={telefone}
             onChangeText={setTelefone}
-            keyboardType="phone-pad"
           />
 
           <Text style={styles.title}>Sexo</Text>
@@ -165,8 +172,9 @@ export default function SignUpUsers() {
           </Picker>
 
           <Text style={styles.title}>CPF/CNPJ</Text>
-          <TextInput 
-            placeholder="Digite seu CPF ou CNPJ"
+          <TextInputMask
+            type={'cpf'}
+            placeholder="999.999.999-99"
             style={styles.input}
             value={cpfCnpj}
             onChangeText={setCpfCnpj}
@@ -181,12 +189,12 @@ export default function SignUpUsers() {
           />
 
           <Text style={styles.title}>CEP</Text>
-          <TextInput 
-            placeholder="Digite seu CEP"
+          <TextInputMask
+            type={'zip-code'}
+            placeholder="99999-999"
             style={styles.input}
             value={cep}
             onChangeText={setCep}
-            keyboardType="numeric"
           />
 
         <Text style={styles.title}>Cidade</Text>
@@ -207,7 +215,7 @@ export default function SignUpUsers() {
 
           <Text style={styles.title}>E-mail</Text>
           <TextInput 
-            placeholder="Digite seu E-mail"
+            placeholder="Digite seu e-mail"
             style={styles.input}
             value={email}
             onChangeText={setEmail}

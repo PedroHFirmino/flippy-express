@@ -181,7 +181,7 @@ const pedidoController = {
             const { id } = req.params;
             const { status, motoboy_id } = req.body;
             const pool = getConnection();
-
+   
             const validStatuses = ['pendente', 'aceito', 'em_andamento', 'entregue', 'cancelado'];
             if (!validStatuses.includes(status)) {
                 console.log('Status inválido:', status);
@@ -190,7 +190,7 @@ const pedidoController = {
                     message: 'Status inválido'
                 });
             }
-
+    
             const [pedidos] = await pool.execute(
                 'SELECT * FROM pedidos WHERE id = ?',
                 [id]
@@ -205,7 +205,25 @@ const pedidoController = {
             }
 
             const pedido = pedidos[0];
-
+            
+            // Verificar se já não está no status que está tentando definir
+            if (pedido.status === status) {
+                console.log('Pedido já está no status:', status);
+                return res.status(400).json({
+                    success: false,
+                    message: `Pedido já está com status '${status}'`
+                });
+            }
+            
+            // Verificar se está tentando finalizar uma entrega já finalizada
+            if (status === 'entregue' && pedido.status === 'entregue') {
+                console.log('Tentativa de finalizar entrega já finalizada:', id);
+                return res.status(400).json({
+                    success: false,
+                    message: 'Entrega já foi finalizada'
+                });
+            }
+       
             if (status === 'aceito' && motoboy_id) {
                 const [motoboys] = await pool.execute(
                     'SELECT status FROM motoboys WHERE id = ? AND status = "online"',
@@ -219,13 +237,13 @@ const pedidoController = {
                         message: 'Motoboy não encontrado ou não está online'
                     });
                 }
-
+             
                 await pool.execute(
                     'UPDATE motoboys SET status = "em_entrega" WHERE id = ?',
                     [motoboy_id]
                 );
             }
-
+       
             if (status === 'entregue' && pedido.motoboy_id) {
                 console.log('Finalizando entrega - Pedido:', pedido.id, 'Motoboy:', pedido.motoboy_id, 'Valor:', pedido.valor);
                 
@@ -248,9 +266,11 @@ const pedidoController = {
                 );
                 console.log('Histórico inserido com ID:', historicoResult.insertId);
                 
+
+                
                 console.log('Entrega finalizada com sucesso!');
             }
-
+   
             const updateData = { status };
             if (motoboy_id) {
                 updateData.motoboy_id = motoboy_id;
@@ -307,7 +327,7 @@ const pedidoController = {
             const pedido = pedidos[0];
 
             res.json({
-              success: true,
+                success: true,
               data: {
                 ...pedido,
                 origem_latitude: Number(pedido.origem_latitude),
@@ -517,6 +537,137 @@ const pedidoController = {
             res.json({ success: true, message: 'Pedido aceito com sucesso' });
         } catch (error) {
             res.status(500).json({ success: false, message: 'Erro ao aceitar pedido' });
+        }
+    },
+
+    // Buscar pedido em andamento de um usuário
+    async getPedidoEmAndamentoUser(req, res) {
+        try {
+            const { userId } = req.params;
+            const pool = getConnection();
+
+            const [pedidos] = await pool.execute(
+                'SELECT * FROM pedidos WHERE user_id = ? AND status = "em_andamento" ORDER BY data_pedido DESC LIMIT 1',
+                [userId]
+            );
+
+            if (pedidos.length === 0) {
+                return res.json({
+                    success: true,
+                    data: null
+                });
+            }
+
+            const pedido = pedidos[0];
+            res.json({
+                success: true,
+                data: {
+                    ...pedido,
+                    origem_latitude: Number(pedido.origem_latitude),
+                    origem_longitude: Number(pedido.origem_longitude),
+                    destino_latitude: Number(pedido.destino_latitude),
+                    destino_longitude: Number(pedido.destino_longitude),
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao buscar pedido em andamento do usuário:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erro interno do servidor'
+            });
+        }
+    },
+
+    // Buscar último pedido de um usuário
+    async getUltimoPedidoUser(req, res) {
+        try {
+            const { userId } = req.params;
+            const pool = getConnection();
+
+            const [pedidos] = await pool.execute(
+                'SELECT * FROM pedidos WHERE user_id = ? ORDER BY data_pedido DESC LIMIT 1',
+                [userId]
+            );
+
+            if (pedidos.length === 0) {
+                return res.json({
+                    success: true,
+                    data: null
+                });
+            }
+
+            const pedido = pedidos[0];
+            res.json({
+                success: true,
+                data: {
+                    ...pedido,
+                    origem_latitude: Number(pedido.origem_latitude),
+                    origem_longitude: Number(pedido.origem_longitude),
+                    destino_latitude: Number(pedido.destino_latitude),
+                    destino_longitude: Number(pedido.destino_longitude),
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao buscar último pedido do usuário:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erro interno do servidor'
+            });
+        }
+    },
+
+    // Buscar entregas do dia de um user específico
+    async getEntregasHojeUser(req, res) {
+        try {
+            const { userId } = req.params;
+            
+            if (!userId) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'ID do usuário é obrigatório'
+                });
+            }
+
+            const pool = getConnection();
+            
+            // Buscar pedidos do user de hoje
+            const [pedidos] = await pool.execute(
+                `SELECT 
+                    p.id,
+                    p.descricao_item,
+                    p.origem_endereco,
+                    p.destino_endereco,
+                    p.valor,
+                    p.status,
+                    p.data_pedido,
+                    p.motoboy_id,
+                    m.nome as motoboy_nome,
+                    m.telefone as motoboy_telefone
+                FROM pedidos p
+                LEFT JOIN motoboys m ON p.motoboy_id = m.id
+                WHERE p.user_id = ? 
+                AND DATE(p.data_pedido) = CURDATE()
+                ORDER BY p.data_pedido DESC`,
+                [userId]
+            );
+
+            // Converter valor para número
+            const pedidosFormatados = pedidos.map(pedido => ({
+                ...pedido,
+                valor: Number(pedido.valor) || 0
+            }));
+
+            res.json({
+                success: true,
+                message: 'Entregas do dia carregadas com sucesso',
+                data: pedidosFormatados
+            });
+        } catch (error) {
+            console.error('Erro ao buscar entregas do dia:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erro interno do servidor'
+            });
         }
     }
 };

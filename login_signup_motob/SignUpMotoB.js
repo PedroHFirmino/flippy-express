@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Alert, Plat
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 import { ScrollView } from 'react-native';
+import { TextInputMask } from 'react-native-masked-text';
 
 
 const API_URL = Platform.OS === 'android' 
@@ -53,6 +54,11 @@ export default function SignUpMotoB() {
 
     if (senha.length < 6) {
       Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres!');
+      return;
+    }
+
+    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+      Alert.alert('Erro', 'E-mail inválido');
       return;
     }
 
@@ -156,25 +162,29 @@ export default function SignUpMotoB() {
             </Picker>
 
             <Text style={styles.title}>CPF</Text>
-            <TextInput 
-              placeholder="Digite seu CPF"
+            <TextInputMask
+              type={'cpf'}
+              placeholder="999.999.999-99"
               style={styles.input}
               value={cpf}
               onChangeText={setCpf}
             />
 
             <Text style={styles.title}>Telefone</Text>
-            <TextInput 
-              placeholder="Digite seu telefone"
+            <TextInputMask
+              type={'cel-phone'}
+              options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
+              placeholder="(99) 99999-9999"
               style={styles.input}
               value={telefone}
               onChangeText={setTelefone}
-              keyboardType="phone-pad"
             />
 
             <Text style={styles.title}>Data de Nascimento</Text>
-            <TextInput 
-              placeholder="DD-MM-AA"
+            <TextInputMask
+              type={'datetime'}
+              options={{ format: 'DD/MM/YYYY' }}
+              placeholder="DD/MM/AAAA"
               style={styles.input}
               value={nascimento}
               onChangeText={setNascimento}
@@ -189,12 +199,12 @@ export default function SignUpMotoB() {
             />
 
             <Text style={styles.title}>CEP</Text>
-            <TextInput 
-              placeholder="Digite seu CEP"
+            <TextInputMask
+              type={'zip-code'}
+              placeholder="99999-999"
               style={styles.input}
               value={cep}
               onChangeText={setCep}
-              keyboardType="numeric"
             />
 
             <Text style={styles.title}>Cidade</Text>
@@ -214,8 +224,8 @@ export default function SignUpMotoB() {
             />        
 
             <Text style={styles.title}>E-mail</Text>
-            <TextInput 
-              placeholder="Digite seu E-mail"
+            <TextInput
+              placeholder="Digite seu e-mail"
               style={styles.input}
               value={email}
               onChangeText={setEmail}

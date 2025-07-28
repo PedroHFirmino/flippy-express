@@ -47,6 +47,9 @@ export default function SignInMotoB () {
             console.log('Resposta da API:', data);
 
             if (response.ok) {
+                // Limpar tokens de usuário para evitar conflitos
+                await AsyncStorage.removeItem('userToken');
+                await AsyncStorage.removeItem('userId');
                 
                 await AsyncStorage.setItem('motoboyToken', data.data.token);
                 

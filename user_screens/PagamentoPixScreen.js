@@ -80,8 +80,14 @@ const PagamentoPixScreen = ({ navigation, route }) => {
       const data = await response.json();
       if (data.success) {
         setPagamentoConfirmado(true);
-        setTimeout(() => {
-          navigation.replace('AguardandoMotoboy');
+        setTimeout(async () => {
+          // Verificar se é um user antes de redirecionar
+          const userToken = await AsyncStorage.getItem('userToken');
+          const motoboyToken = await AsyncStorage.getItem('motoboyToken');
+          
+          if (userToken && !motoboyToken) {
+            navigation.replace('AguardandoMotoboy');
+          }
         }, 1500);
       } else {
         Alert.alert('Erro', data.message || 'Erro ao registrar pedido.');

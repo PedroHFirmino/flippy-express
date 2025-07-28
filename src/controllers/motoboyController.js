@@ -781,7 +781,7 @@ const motoboyController = {
             const { id } = req.params;
             const pool = getConnection();
             const [pedidos] = await pool.execute(
-                'SELECT * FROM pedidos WHERE motoboy_id = ? AND status = "em_andamento" LIMIT 1',
+                'SELECT * FROM pedidos WHERE motoboy_id = ? AND (status = "em_andamento" OR status = "aceito") AND status != "entregue" LIMIT 1',
                 [id]
             );
             if (pedidos.length === 0) {
@@ -800,6 +800,37 @@ const motoboyController = {
             });
         } catch (error) {
             res.status(500).json({ success: false, message: 'Erro ao buscar entrega em andamento' });
+        }
+    },
+
+    // Buscar informações de um motoboy específico
+    async getMotoboyById(req, res) {
+        try {
+            const { id } = req.params;
+            const pool = getConnection();
+            
+            const [motoboys] = await pool.execute(
+                'SELECT id, nome, telefone, email, cidade, estado FROM motoboys WHERE id = ?',
+                [id]
+            );
+
+            if (motoboys.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Motoboy não encontrado'
+                });
+            }
+
+            res.json({
+                success: true,
+                data: motoboys[0]
+            });
+        } catch (error) {
+            console.error('Erro ao buscar motoboy por ID:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erro interno do servidor'
+            });
         }
     },
 

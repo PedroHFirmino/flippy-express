@@ -82,9 +82,16 @@ const MotoboyMapScreen = () => {
       try {
         const response = await fetch(`${API_URL}/motoboys/${motoboyId}/em-andamento`);
         const data = await response.json();
-        if (data.success && data.data) {
+        
+        // Só redirecionar se há entrega em andamento E não está entregue/cancelada
+        if (data.success && data.data && 
+            data.data.status !== 'entregue' && 
+            data.data.status !== 'cancelado' && 
+            (data.data.status === 'aceito' || data.data.status === 'em_andamento')) {
           setNavegouEntrega(true);
           navigation.navigate('EntregaEmAndamento', { pedido: data.data });
+        } else if (data.success && data.data && data.data.status === 'entregue') {
+  
         }
       } catch (e) {}
     };
