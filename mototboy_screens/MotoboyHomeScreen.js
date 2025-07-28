@@ -24,11 +24,17 @@ const MotoboyHomeScreen = () => {
         // Recuperar ID do motoboy do token (simples, pode ser melhorado)
         const getMotoboyId = async () => {
             const token = await AsyncStorage.getItem('motoboyToken');
-            if (!token) return;
+            if (!token) {
+                console.log('Token não encontrado no AsyncStorage');
+                return;
+            }
             try {
                 const payload = JSON.parse(atob(token.split('.')[1]));
+                console.log('MotoboyId extraído do token:', payload.id);
                 setMotoboyId(payload.id);
-            } catch (e) {}
+            } catch (e) {
+                console.error('Erro ao extrair motoboyId do token:', e);
+            }
         };
         getMotoboyId();
     }, []);
@@ -48,18 +54,28 @@ const MotoboyHomeScreen = () => {
     useFocusEffect(
       React.useCallback(() => {
         const fetchStats = async () => {
-          if (!motoboyId) return;
+          if (!motoboyId) {
+            console.log('MotoboyId não encontrado, não buscando stats');
+            return;
+          }
           try {
+            console.log('Buscando stats para motoboy:', motoboyId);
             const API_URL = Platform.OS === 'android'
               ? 'http://192.168.237.64:3000/api'
               : 'http://localhost:3000/api';
             const response = await fetch(`${API_URL}/motoboys/${motoboyId}/stats-dia`);
             const data = await response.json();
+            console.log('Resposta da API stats:', data);
             if (data.success) {
               setEntregasHoje(data.data.entregasHoje || 0);
               setGanhosHoje(data.data.ganhosHoje || 0);
+              console.log('Stats atualizadas:', data.data);
+            } else {
+              console.error('Erro na resposta da API stats:', data.message);
             }
-          } catch (e) {}
+          } catch (e) {
+            console.error('Erro ao buscar stats:', e);
+          }
         };
         fetchStats();
 

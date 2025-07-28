@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, SafeAreaView, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import tw from 'twrnc';
 
 const API_URL = Platform.OS === 'android' 
@@ -17,6 +17,12 @@ const RankingScreen = () => {
     useEffect(() => {
         loadRanking();
     }, [selectedPeriod]);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            loadRanking();
+        }, [selectedPeriod])
+    );
 
     const loadRanking = async () => {
         setLoading(true);
@@ -49,6 +55,7 @@ const RankingScreen = () => {
                 
                 setRankingData(processedData);
                 console.log(`Ranking carregado: ${processedData.length} motoboys`);
+                console.log('Dados do ranking:', processedData);
             } else {
                 console.error('Erro ao carregar ranking:', data.message);
                 Alert.alert('Erro', `Não foi possível carregar o ranking: ${data.message}`);

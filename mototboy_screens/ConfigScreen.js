@@ -4,6 +4,7 @@ import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TextInputMask } from 'react-native-masked-text';
 
 const API_URL = Platform.OS === 'android' 
   ? 'http://192.168.237.64:3000/api'  
@@ -72,6 +73,12 @@ const ConfigScreen = () => {
 
         if (!name.trim() || !email.trim() || !phone.trim()) {
             Alert.alert('Erro', 'Nome, email e telefone são obrigatórios');
+            return;
+        }
+
+        if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+            Alert.alert('Erro', 'E-mail inválido');
+            setLoading(false);
             return;
         }
 
@@ -195,16 +202,18 @@ const ConfigScreen = () => {
                             placeholder="Digite seu e-mail"
                             value={email}
                             editable={false}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
                         />
                         <Text style={styles.disabledText}>E-mail não pode ser alterado</Text>
                         <Text style={styles.label}>Telefone</Text>
-                        <TextInput
+                        <TextInputMask
+                            type={'cel-phone'}
+                            options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
+                            placeholder="(99) 99999-9999"
                             style={styles.input}
-                            placeholder="Digite seu telefone"
                             value={phone}
                             onChangeText={setPhone}
-                            keyboardType="phone-pad"
-                            editable={!loading}
                         />
                         <Text style={styles.label}>Nova Senha (opcional)</Text>
                         <TextInput

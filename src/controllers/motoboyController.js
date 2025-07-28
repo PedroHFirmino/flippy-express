@@ -736,17 +736,33 @@ const motoboyController = {
     async getStatsDia(req, res) {
         try {
             const { id } = req.params;
+            console.log('Buscando stats para motoboy ID:', id);
             const pool = getConnection();
-            // Entregas e ganhos do dia
+            // Entregas e ganhos do dia (sem filtro de data para debug)
             const [result] = await pool.execute(
                 `SELECT COUNT(*) as entregasHoje, COALESCE(SUM(gm.valor_ganho),0) as ganhosHoje
                  FROM pedidos p
                  JOIN ganhos_motoboy gm ON gm.pedido_id = p.id
                  WHERE p.motoboy_id = ?
-                   AND p.status = 'entregue'
-                   AND DATE(p.data_entrega) = CURDATE()`,
+                   AND p.status = 'entregue'`,
                 [id]
             );
+            
+            // Debug: verificar se há pedidos entregues hoje
+            const [pedidosHoje] = await pool.execute(
+                `SELECT id, status, data_entrega, valor FROM pedidos 
+                 WHERE motoboy_id = ? AND status = 'entregue'`,
+                [id]
+            );
+            console.log('Pedidos entregues pelo motoboy:', pedidosHoje);
+            
+            // Debug: verificar ganhos do motoboy
+            const [ganhos] = await pool.execute(
+                `SELECT * FROM ganhos_motoboy WHERE motoboy_id = ?`,
+                [id]
+            );
+            console.log('Ganhos do motoboy:', ganhos);
+            console.log('Resultado da query stats:', result[0]);
             res.json({
                 success: true,
                 data: {
@@ -755,6 +771,7 @@ const motoboyController = {
                 }
             });
         } catch (error) {
+            console.error('Erro ao buscar stats do dia:', error);
             res.status(500).json({ success: false, message: 'Erro ao buscar estatísticas do dia' });
         }
     },
@@ -783,6 +800,44 @@ const motoboyController = {
             });
         } catch (error) {
             res.status(500).json({ success: false, message: 'Erro ao buscar entrega em andamento' });
+        }
+    },
+
+    
+    async testarDados(req, res) {
+        try {
+            const { id } = req.params;
+            const pool = getConnection();
+            
+       
+            const [pedidos] = await pool.execute(
+                'SELECT id, status, valor, data_entrega FROM pedidos WHERE motoboy_id = ? AND status = "entregue"',
+                [id]
+            );
+
+
+            const [ganhos] = await pool.execute(
+                'SELECT * FROM ganhos_motoboy WHERE motoboy_id = ?',
+                [id]
+            );
+            
+      
+            const [historico] = await pool.execute(
+                'SELECT * FROM historico_entregas WHERE motoboy_id = ?',
+                [id]
+            );
+            
+            res.json({
+                success: true,
+                data: {
+                    pedidos_entregues: pedidos,
+                    ganhos: ganhos,
+                    historico: historico
+                }
+            });
+        } catch (error) {
+            console.error('Erro no teste de dados:', error);
+            res.status(500).json({ success: false, message: 'Erro ao testar dados' });
         }
     }
 };

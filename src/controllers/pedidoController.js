@@ -227,10 +227,28 @@ const pedidoController = {
             }
 
             if (status === 'entregue' && pedido.motoboy_id) {
+                console.log('Finalizando entrega - Pedido:', pedido.id, 'Motoboy:', pedido.motoboy_id, 'Valor:', pedido.valor);
+                
                 await pool.execute(
                     'UPDATE motoboys SET status = "online" WHERE id = ?',
                     [pedido.motoboy_id]
                 );
+                
+                // Inserir ganho do motoboy na tabela ganhos_motoboy
+                const [ganhoResult] = await pool.execute(
+                    'INSERT INTO ganhos_motoboy (motoboy_id, pedido_id, valor_ganho, data_ganho) VALUES (?, ?, ?, NOW())',
+                    [pedido.motoboy_id, pedido.id, pedido.valor]
+                );
+                console.log('Ganho inserido com ID:', ganhoResult.insertId);
+                
+                // Inserir no histórico de entregas
+                const [historicoResult] = await pool.execute(
+                    'INSERT INTO historico_entregas (pedido_id, motoboy_id, user_id, valor_entrega, data_entrega) VALUES (?, ?, ?, ?, NOW())',
+                    [pedido.id, pedido.motoboy_id, pedido.user_id, pedido.valor]
+                );
+                console.log('Histórico inserido com ID:', historicoResult.insertId);
+                
+                console.log('Entrega finalizada com sucesso!');
             }
 
             const updateData = { status };

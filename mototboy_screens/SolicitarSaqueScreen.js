@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, SafeAreaView, Alert, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Linking } from 'react-native';
 
 const API_URL = Platform.OS === 'android' 
   ? 'http://192.168.237.64:3000/api'  
@@ -16,6 +17,26 @@ const SolicitarSaqueScreen = () => {
     const [banco, setBanco] = useState('');
     const [loading, setLoading] = useState(false);
     const [token, setToken] = useState(null);
+    const [valorSemana, setValorSemana] = useState(0);
+
+    // Buscar valor da semana ao montar a tela
+    useEffect(() => {
+      const fetchValorSemana = async () => {
+        try {
+          const storedToken = await AsyncStorage.getItem('motoboyToken');
+          if (!storedToken) return;
+          const API_URL = Platform.OS === 'android'
+            ? 'http://192.168.237.64:3000/api'
+            : 'http://localhost:3000/api';
+          const response = await fetch(`${API_URL}/motoboys/valor-semana`, {
+            headers: { 'Authorization': `Bearer ${storedToken}` }
+          });
+          const data = await response.json();
+          if (data.success) setValorSemana(data.data.valorSemana || 0);
+        } catch (e) {}
+      };
+      fetchValorSemana();
+    }, []);
 
     const handleSubmit = async () => {
         if (!nome.trim() || !chavePix.trim() || !banco.trim()) {
@@ -33,35 +54,17 @@ const SolicitarSaqueScreen = () => {
                 return;
             }
 
-            const response = await fetch(`${API_URL}/motoboys/solicitar-saque`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${storedToken}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    nome: nome.trim(),
-                    chavePix: chavePix.trim(),
-                    banco: banco.trim()
-                })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                Alert.alert('Sucesso', 'Solicitação de saque enviada com sucesso!');
-                setNome('');
-                setChavePix('');
-                setBanco('');
-                navigation.goBack();
-            } else {
-                Alert.alert('Erro', data.message || 'Erro ao enviar solicitação');
-            }
-        } catch (error) {
-            console.error('Erro ao enviar solicitação:', error);
-            Alert.alert('Erro', 'Erro de conexão ao enviar solicitação');
-        } finally {
+            // Montar mensagem para WhatsApp
+            const mensagem = `Solicitação de Saque\nNome: ${nome}\nChave Pix: ${chavePix}\nBanco: ${banco}\nValor disponível na semana: R$ ${typeof valorSemana === 'number' ? valorSemana.toFixed(2) : (Number(valorSemana) ? Number(valorSemana).toFixed(2) : '0,00')}`;
+            const numeroWhatsapp = '5544998522858'; 
+            const url = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(mensagem)}`;
+            Linking.openURL(url);
             setLoading(false);
+            Alert.alert('Sucesso', 'Solicitação enviada via WhatsApp!');
+            navigation.goBack();
+        } catch (error) {
+            setLoading(false);
+            Alert.alert('Erro', 'Erro ao abrir o WhatsApp');
         }
     };
 
@@ -105,6 +108,13 @@ const SolicitarSaqueScreen = () => {
                         onChangeText={setBanco}
                         editable={!loading}
                     />
+
+                    <Text style={styles.label}>Valor disponível na semana</Text>
+                    <View style={styles.input} pointerEvents="none">
+                      <Text style={{ fontSize: 16, color: '#333' }}>
+                        R$ {typeof valorSemana === 'number' ? valorSemana.toFixed(2) : (Number(valorSemana) ? Number(valorSemana).toFixed(2) : '0,00')}
+                      </Text>
+                    </View>
 
                     <TouchableOpacity 
                         style={[styles.submitButton, loading && styles.submitButtonDisabled]} 

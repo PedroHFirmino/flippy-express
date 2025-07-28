@@ -12,6 +12,7 @@ router.get('/ranking', motoboyController.getRanking);
 router.get('/testar-calculo-precos', motoboyController.testarCalculoPrecos);
 router.get('/:id/stats-dia', motoboyController.getStatsDia);
 router.get('/:id/em-andamento', motoboyController.getPedidoEmAndamento);
+router.get('/:id/testar-dados', motoboyController.testarDados);
 
 
 router.get('/profile', verifyToken, verifyMotoboy, motoboyController.getProfile);
