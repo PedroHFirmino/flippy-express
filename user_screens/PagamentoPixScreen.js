@@ -68,7 +68,9 @@ const PagamentoPixScreen = ({ navigation, route }) => {
         destino_longitude: pedidoData.destino_longitude,
         destino_endereco: pedidoData.destino_endereco,
         descricao_item: pedidoData.descricao_item,
-        observacoes: pedidoData.observacoes || null
+        observacoes: pedidoData.observacoes || null,
+        distancia_km: pedidoData.distancia_km,
+        valor_calculado: pedidoData.valor_calculado
       };
       const response = await fetch(`${API_URL}/pedidos/create`, {
         method: 'POST',

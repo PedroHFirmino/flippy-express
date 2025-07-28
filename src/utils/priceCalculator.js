@@ -4,10 +4,9 @@
 
 const PRECO_POR_KM = 2.00; // R$ 2,00 por km
 const TAXA_APLICATIVO = 1.50; // R$ 1,50 taxa fixa do aplicativo
-const COMISSAO_MOTOBOY = 0.80; // 80% para o motoboy
 
 /**
- 
+ * Calcula o valor da entrega baseado na distância
  * @param {number} distanciaKm 
  * @returns {object} 
  */
@@ -18,8 +17,8 @@ function calcularValorEntrega(distanciaKm) {
 
     const valorPorDistancia = distanciaKm * PRECO_POR_KM;
     const valorTotal = valorPorDistancia + TAXA_APLICATIVO;
-    const valorMotoboy = valorTotal * COMISSAO_MOTOBOY;
-    const valorAplicativo = valorTotal - valorMotoboy;
+    const valorMotoboy = valorPorDistancia; 
+    const valorAplicativo = TAXA_APLICATIVO; 
 
     return {
         distancia_km: parseFloat(distanciaKm.toFixed(2)),
@@ -28,7 +27,7 @@ function calcularValorEntrega(distanciaKm) {
         valor_total: parseFloat(valorTotal.toFixed(2)),
         valor_motoboy: parseFloat(valorMotoboy.toFixed(2)),
         valor_aplicativo: parseFloat(valorAplicativo.toFixed(2)),
-        comissao_percentual: COMISSAO_MOTOBOY * 100
+        comissao_percentual: 100 
     };
 }
 
@@ -70,6 +69,5 @@ module.exports = {
     calcularDistancia,
     validarCoordenadas,
     PRECO_POR_KM,
-    TAXA_APLICATIVO,
-    COMISSAO_MOTOBOY
+    TAXA_APLICATIVO
 }; 

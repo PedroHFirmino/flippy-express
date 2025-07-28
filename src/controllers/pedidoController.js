@@ -56,8 +56,14 @@ const pedidoController = {
             let valor = null;
             let tempo_estimado_minutos = null;
 
-            if (origem_latitude && origem_longitude && destino_latitude && destino_longitude) {
-                // Calcular distância usando coordenadas
+
+            if (req.body.distancia_km) {
+                distancia_km = parseFloat(req.body.distancia_km);
+                const calculoEntrega = calcularValorEntrega(distancia_km);
+                valor = calculoEntrega.valor_motoboy;
+                tempo_estimado_minutos = Math.ceil(distancia_km * 3);
+            } else if (origem_latitude && origem_longitude && destino_latitude && destino_longitude) {
+        
                 distancia_km = calcularDistancia(
                     origem_latitude, origem_longitude,
                     destino_latitude, destino_longitude
@@ -65,14 +71,14 @@ const pedidoController = {
                 
                 // Calcular valor da entrega
                 const calculoEntrega = calcularValorEntrega(distancia_km);
-                valor = calculoEntrega.valor_total;
+                valor = calculoEntrega.valor_motoboy;
                 
-                // Estimar tempo baseado na distância (aproximadamente 3 min/km em cidade)
+            
                 tempo_estimado_minutos = Math.ceil(distancia_km * 3);
             } else {
                 // Se não há coordenadas, usar valor padrão mínimo
-                valor = 5.00; // Valor mínimo de entrega
-                distancia_km = 1.75; // Distância estimada para valor mínimo
+                valor = 5.00;
+                distancia_km = 1.75; 
                 tempo_estimado_minutos = 5;
             }
 

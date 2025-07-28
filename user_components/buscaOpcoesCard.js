@@ -136,7 +136,8 @@ const BuscaOpcoesCard = () => {
         destino_longitude: destination.location.lng || destination.location.longitude,
         destino_endereco: destination.description,
         descricao_item: itemDescription,
-      
+        distancia_km: valorEntrega ? (valorEntrega - 1.5) / 2 : null, // Calcula a distância baseada no valor
+        valor_calculado: valorEntrega
       }
     });
   };
