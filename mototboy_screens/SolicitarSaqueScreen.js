@@ -109,12 +109,12 @@ const SolicitarSaqueScreen = () => {
                         editable={!loading}
                     />
 
-                    <Text style={styles.label}>Valor disponível na semana</Text>
+                    {/* <Text style={styles.label}>Valor disponível na semana</Text>
                     <View style={styles.input} pointerEvents="none">
                       <Text style={{ fontSize: 16, color: '#333' }}>
                         R$ {typeof valorSemana === 'number' ? valorSemana.toFixed(2) : (Number(valorSemana) ? Number(valorSemana).toFixed(2) : '0,00')}
                       </Text>
-                    </View>
+                    </View> */}
 
                     <TouchableOpacity 
                         style={[styles.submitButton, loading && styles.submitButtonDisabled]} 
