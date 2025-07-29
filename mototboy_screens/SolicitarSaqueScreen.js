@@ -18,24 +18,26 @@ const SolicitarSaqueScreen = () => {
     const [loading, setLoading] = useState(false);
     const [token, setToken] = useState(null);
     const [valorSemana, setValorSemana] = useState(0);
+    const [telefoneMotoboy, setTelefoneMotoboy] = useState('');
 
-    // Buscar valor da semana ao montar a tela
+    // Buscar dados do motoboy ao montar a tela
     useEffect(() => {
-      const fetchValorSemana = async () => {
+      const fetchDadosMotoboy = async () => {
         try {
           const storedToken = await AsyncStorage.getItem('motoboyToken');
           if (!storedToken) return;
-          const API_URL = Platform.OS === 'android'
-            ? 'http://192.168.237.64:3000/api'
-            : 'http://localhost:3000/api';
-          const response = await fetch(`${API_URL}/motoboys/valor-semana`, {
+          
+          // Buscar dados do motoboy (incluindo telefone)
+          const response = await fetch(`${API_URL}/motoboys/profile`, {
             headers: { 'Authorization': `Bearer ${storedToken}` }
           });
           const data = await response.json();
-          if (data.success) setValorSemana(data.data.valorSemana || 0);
+          if (data.success) {
+            setTelefoneMotoboy(data.data.telefone || '');
+          }
         } catch (e) {}
       };
-      fetchValorSemana();
+      fetchDadosMotoboy();
     }, []);
 
     const handleSubmit = async () => {
@@ -56,7 +58,9 @@ const SolicitarSaqueScreen = () => {
 
             // Montar mensagem para WhatsApp
             const mensagem = `Solicitação de Saque\nNome: ${nome}\nChave Pix: ${chavePix}\nBanco: ${banco}\nValor disponível na semana: R$ ${typeof valorSemana === 'number' ? valorSemana.toFixed(2) : (Number(valorSemana) ? Number(valorSemana).toFixed(2) : '0,00')}`;
-            const numeroWhatsapp = '5544998522858'; 
+            const telefoneLimpo = telefoneMotoboy.replace(/\D/g, '');
+            const numeroWhatsapp = telefoneLimpo || '5544998522858'; // fallback se não encontrar
+            
             const url = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(mensagem)}`;
             Linking.openURL(url);
             setLoading(false);

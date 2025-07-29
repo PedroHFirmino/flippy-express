@@ -271,7 +271,7 @@ const MotoboyHomeScreen = () => {
                         <Text style={styles.menuText}>Ranking</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.menuItem}>
+                    {/* <TouchableOpacity style={styles.menuItem}>
                         <Icon
                             name="attach-money"
                             type="material"
@@ -279,7 +279,7 @@ const MotoboyHomeScreen = () => {
                             size={24}
                         />
                         <Text style={styles.menuText}>Ganhos</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     <TouchableOpacity 
                         style={styles.menuItem}
